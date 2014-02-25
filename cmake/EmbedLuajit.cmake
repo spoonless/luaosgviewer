@@ -1,8 +1,6 @@
-set(LUAJIT_INSTALL_DIR "${CMAKE_CURRENT_BINARY_DIR}/dependency")
- 
 include(ExternalProject)
 ###############################################
-# Download, compile and install localy luajit
+# Download, compile and install locally luajit
 ###############################################
 # Note: FFI is disabled for security reasons
 ExternalProject_Add(
@@ -12,11 +10,24 @@ ExternalProject_Add(
   PREFIX "${CMAKE_CURRENT_BINARY_DIR}/luajit"
   CONFIGURE_COMMAND ""
   BUILD_IN_SOURCE 1
-  BUILD_COMMAND make CFLAGS="-DLUAJIT_DISABLE_FFI"
-  INSTALL_COMMAND make install DESTDIR="${LUAJIT_INSTALL_DIR}"
+  BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} CFLAGS="-DLUAJIT_DISABLE_FFI" BUILDMODE=static
+  INSTALL_COMMAND ""
 )
 
+ExternalProject_Get_Property(project_luajit SOURCE_DIR)
+set(LUAJIT_SOURCE_DIR "${SOURCE_DIR}/src")
+
 add_library(luajit STATIC IMPORTED)
-set_property(TARGET luajit PROPERTY IMPORTED_LOCATION "${LUAJIT_INSTALL_DIR}/usr/local/lib/libluajit-5.1.a")
+set_property(TARGET luajit PROPERTY IMPORTED_LOCATION "${LUAJIT_SOURCE_DIR}/libluajit.a")
 add_dependencies(luajit project_luajit)
-include_directories("${LUAJIT_INSTALL_DIR}/usr/local/include/luajit-2.0")
+
+set(LUAJIT_INCLUDE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/dependency/include")
+file(MAKE_DIRECTORY "${LUAJIT_INCLUDE_DIRECTORY}")
+
+foreach(HEADER_FILE lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h)
+  ExternalProject_Add_Step(project_luajit ${HEADER_FILE}
+    COMMAND ${CMAKE_COMMAND} -E copy "${LUAJIT_SOURCE_DIR}/${HEADER_FILE}" "${LUAJIT_INCLUDE_DIRECTORY}" DEPENDEES install
+  )
+endforeach(HEADER_FILE)
+
+include_directories("${LUAJIT_INCLUDE_DIRECTORY}")
