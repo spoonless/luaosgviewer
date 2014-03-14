@@ -8,6 +8,6 @@ include("cmake/LuaSWIG.cmake")
 ###############################################
 # main project settings
 ###############################################
-generate_lua_wrap("module.i" GENERATED_SOURCES)
-add_executable(MyProject main.cpp module.c ${GENERATED_SOURCES})
+generate_lua_wrap("src/module.i" GENERATED_SOURCES)
+add_executable(MyProject src/main.cpp src/module.c ${GENERATED_SOURCES})
 target_link_libraries(MyProject luajit)
