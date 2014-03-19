@@ -5,7 +5,7 @@ include(FindSWIG 2.0)
 ###############################################
 if(NOT SWIG_EXECUTABLE)
   message(FATAL_ERROR 
-          "Enable to find SWIG executable! SWIG version 2.0 (or higher) is required to generate Lua bindings.\n"
+          "Cannot find SWIG executable! SWIG version 2.0 (or higher) is required to generate Lua bindings.\n"
           "For more information: http://www.swig.org/")
 endif(NOT SWIG_EXECUTABLE)
 
