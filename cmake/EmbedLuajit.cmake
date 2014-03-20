@@ -21,13 +21,13 @@ add_library(luajit STATIC IMPORTED)
 set_property(TARGET luajit PROPERTY IMPORTED_LOCATION "${LUAJIT_SOURCE_DIR}/libluajit.a")
 add_dependencies(luajit project_luajit)
 
-set(LUAJIT_INCLUDE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/dependency/include")
-file(MAKE_DIRECTORY "${LUAJIT_INCLUDE_DIRECTORY}")
+set(LUAJIT_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/dependency/include")
+file(MAKE_DIRECTORY "${LUAJIT_INCLUDE_DIR}")
 
 foreach(HEADER_FILE lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h)
   ExternalProject_Add_Step(project_luajit ${HEADER_FILE}
-    COMMAND ${CMAKE_COMMAND} -E copy "${LUAJIT_SOURCE_DIR}/${HEADER_FILE}" "${LUAJIT_INCLUDE_DIRECTORY}" DEPENDEES install
+    COMMAND ${CMAKE_COMMAND} -E copy "${LUAJIT_SOURCE_DIR}/${HEADER_FILE}" "${LUAJIT_INCLUDE_DIR}" DEPENDEES install
   )
 endforeach()
 
-include_directories("${LUAJIT_INCLUDE_DIRECTORY}")
+set(LUAJIT_LIBRARY "luajit")

@@ -14,9 +14,11 @@ find_package( osgUtil )
 find_package( osgViewer )
 find_package( osgGA )
 
-macro( config_project PROJNAME LIBNAME )
-  include_directories( ${${LIBNAME}_INCLUDE_DIR} )
-  target_link_libraries( ${PROJNAME} ${${LIBNAME}_LIBRARY} )
+macro( config_project PROJNAME )
+    foreach(LIBNAME ${ARGN})
+        include_directories( ${${LIBNAME}_INCLUDE_DIR} )
+        target_link_libraries( ${PROJNAME} ${${LIBNAME}_LIBRARY} )
+    endforeach()
 endmacro()
 
 ###############################################
@@ -36,13 +38,8 @@ add_executable(MyProject
     ${SOURCES}
 )
 
-target_link_libraries(MyProject luajit)
-config_project( MyProject OPENTHREADS )
-config_project( MyProject OSG )
-config_project( MyProject OSGDB )
-config_project( MyProject OSGGA )
-config_project( MyProject OSGUTIL )
-config_project( MyProject OSGVIEWER )
+config_project( MyProject LUAJIT )
+config_project( MyProject OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER )
 
 ###############################################
 # unit tests project settings
@@ -55,5 +52,5 @@ if(BUILD_UNITTESTS)
                    test/scriptengine_test.cpp
                    ${SOURCES}
     )
-    target_link_libraries(unittest gtest luajit)
+    config_project( unittest LUAJIT GTEST )
 endif()

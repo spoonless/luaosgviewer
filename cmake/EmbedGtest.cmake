@@ -20,4 +20,5 @@ add_library(gtest STATIC IMPORTED)
 set_property(TARGET gtest PROPERTY IMPORTED_LOCATION "${BINARY_DIR}/libgtest.a")
 add_dependencies(gtest project_gtest)
 
-include_directories("${SOURCE_DIR}/include")
+set(GTEST_INCLUDE_DIR "${SOURCE_DIR}/include")
+set(GTEST_LIBRARY gtest)
