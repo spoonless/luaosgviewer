@@ -28,6 +28,6 @@ foreach(HEADER_FILE lua.h lualib.h lauxlib.h luaconf.h lua.hpp luajit.h)
   ExternalProject_Add_Step(project_luajit ${HEADER_FILE}
     COMMAND ${CMAKE_COMMAND} -E copy "${LUAJIT_SOURCE_DIR}/${HEADER_FILE}" "${LUAJIT_INCLUDE_DIRECTORY}" DEPENDEES install
   )
-endforeach(HEADER_FILE)
+endforeach()
 
 include_directories("${LUAJIT_INCLUDE_DIRECTORY}")

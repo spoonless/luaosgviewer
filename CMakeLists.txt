@@ -2,10 +2,9 @@ cmake_minimum_required(VERSION 2.8)
 
 project(MyProject)
 
-project(unittest)
+option(BUILD_UNITTESTS "Build all unit tests." OFF)
 
 include("cmake/EmbedLuajit.cmake")
-include("cmake/EmbedGtest.cmake")
 include("cmake/LuaSWIG.cmake")
 
 find_package( OpenThreads )
@@ -46,12 +45,15 @@ config_project( MyProject OSGUTIL )
 config_project( MyProject OSGVIEWER )
 
 ###############################################
-# test project settings
+# unit tests project settings
 ###############################################
-include_directories("src")
-add_executable(unittest
-    test/main.cpp
-    test/scriptengine_test.cpp
-    ${SOURCES}
-)
-target_link_libraries(unittest gtest luajit)
+if(BUILD_UNITTESTS)
+    include("cmake/EmbedGtest.cmake")
+    include_directories("src")
+    add_executable(unittest
+                   test/main.cpp
+                   test/scriptengine_test.cpp
+                   ${SOURCES}
+    )
+    target_link_libraries(unittest gtest luajit)
+endif()
