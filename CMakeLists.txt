@@ -54,4 +54,4 @@ add_executable(unittest
     test/scriptengine_test.cpp
     ${SOURCES}
 )
-target_link_libraries(unittest gtest pthread luajit)
+target_link_libraries(unittest gtest luajit)
