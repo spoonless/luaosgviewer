@@ -1,3 +1,5 @@
+#include <cassert>
+#include <algorithm>
 #include "scriptengine.h"
 #include "lua.hpp"
 
@@ -47,6 +49,14 @@ static void openlib(lua_State *L, const char *name, lua_CFunction func)
     lua_call(L, 1, 0);
 }
 
+ScriptResultHandler::ScriptResultHandler(unsigned int expectedResults) : _expectedResults(expectedResults)
+{
+}
+
+ScriptResultHandler::~ScriptResultHandler()
+{
+}
+
 ScriptEngine::ScriptEngine() : _luaState(0)
 {
     this->init();
@@ -88,7 +98,7 @@ bool ScriptEngine::assertEngineReady()
     return true;
 }
 
-bool ScriptEngine::exec(std::istream &istream, const char *streamname)
+bool ScriptEngine::exec(unsigned int nbExpectedResults, std::istream &istream, const char *streamname)
 {
     if (!this->assertEngineReady())
     {
@@ -101,7 +111,7 @@ bool ScriptEngine::exec(std::istream &istream, const char *streamname)
     }
 
     LuaReader *luaReader = new LuaReader(istream);
-    int error = lua_load(_luaState, luaReadFromIstream, luaReader, streamname) || lua_pcall(_luaState, 0, 0, 0);
+    int error = lua_load(_luaState, luaReadFromIstream, luaReader, streamname) || lua_pcall(_luaState, 0, nbExpectedResults, 0);
     delete luaReader;
 
     if(istream.fail())
@@ -118,4 +128,19 @@ bool ScriptEngine::exec(std::istream &istream, const char *streamname)
         lua_pop(_luaState, 1);
     }
     return _lastError.empty();
+}
+
+bool ScriptEngine::exec(ScriptResultHandler &handler, std::istream &istream, const char *streamname)
+{
+    if (this->exec(handler.expectedResults(), istream, streamname))
+    {
+        int finalStackSize = std::max(static_cast<unsigned int>(0), lua_gettop(this->_luaState) - handler.expectedResults());
+        handler.handle(this->_luaState);
+        int nbElementsToPop = std::max(0, lua_gettop(this->_luaState) - finalStackSize);
+        lua_pop(this->_luaState, nbElementsToPop);
+
+        assert(lua_gettop(this->_luaState) == finalStackSize);
+        return true;
+    }
+    return false;
 }

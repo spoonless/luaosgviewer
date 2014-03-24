@@ -53,4 +53,5 @@ if(BUILD_UNITTESTS)
                    ${SOURCES}
     )
     config_project( unittest LUAJIT GTEST )
+    config_project( unittest OPENTHREADS OSG)
 endif()
