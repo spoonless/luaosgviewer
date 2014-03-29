@@ -33,7 +33,7 @@ public:
 
     void handle(lua_State *luaState)
     {
-        for (int i = 1; i <= this->expectedResults(); ++i)
+        for (unsigned int i = 1; i <= this->expectedResults(); ++i)
         {
             _results[this->expectedResults() - i] = lua_tointeger(luaState, -i);
         }
