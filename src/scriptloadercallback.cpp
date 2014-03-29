@@ -1,3 +1,4 @@
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <fstream>
 #include "osg/Group"
@@ -69,12 +70,15 @@ void ScriptLoaderCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
 }
 
 #ifdef WIN32
+typedef struct __stat64 Stat64;
 #define stat64 _stat64
+#else
+typedef struct stat64 Stat64;
 #endif
 
 time_t ScriptLoaderCallback::getLastModificationDate()
 {
-    struct stat64 filestat;
+    Stat64 filestat;
     if(stat64(this->_filename.c_str(), &filestat) == 0)
     {
         return filestat.st_mtime;
