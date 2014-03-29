@@ -1,8 +1,14 @@
 cmake_minimum_required(VERSION 2.8)
 
+if(CMAKE_BUILD_TOOL MATCHES "make")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+endif()
+
 project(MyProject)
 
 option(BUILD_UNITTESTS "Build all unit tests." OFF)
+
 
 include("cmake/EmbedLuajit.cmake")
 include("cmake/LuaSWIG.cmake")
@@ -27,9 +33,11 @@ endmacro()
 generate_lua_wrap("src/module.i" GENERATED_SOURCES)
 
 set(SOURCES
-    src/module.c
+    src/module.cpp
     src/scriptengine.cpp
     src/scriptengine.h
+    src/scriptloadercallback.h
+    src/scriptloadercallback.cpp
     ${GENERATED_SOURCES}
 )
 
@@ -53,5 +61,5 @@ if(BUILD_UNITTESTS)
                    ${SOURCES}
     )
     config_project( unittest LUAJIT GTEST )
-    config_project( unittest OPENTHREADS OSG)
+    config_project( unittest OPENTHREADS OSG OSGDB)
 endif()

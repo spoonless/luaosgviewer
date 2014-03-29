@@ -5,6 +5,10 @@
 
 #define BUFFER_READER 1024
 
+extern "C" {
+int luaopen_geometry(lua_State*);
+}
+
 class LuaReader {
 public :
     LuaReader(std::istream &istream);
@@ -77,6 +81,7 @@ void ScriptEngine::init()
     openlib(_luaState, "table", luaopen_table);
     openlib(_luaState, "debug", luaopen_debug);
     openlib(_luaState, "jit", luaopen_jit);
+    openlib(_luaState, "geometry", luaopen_geometry);
 }
 
 void ScriptEngine::destroy()
@@ -98,7 +103,7 @@ bool ScriptEngine::assertEngineReady()
     return true;
 }
 
-bool ScriptEngine::exec(unsigned int nbExpectedResults, std::istream &istream, const char *streamname)
+bool ScriptEngine::load(std::istream &istream, const char *streamname)
 {
     if (!this->assertEngineReady())
     {
@@ -111,23 +116,41 @@ bool ScriptEngine::exec(unsigned int nbExpectedResults, std::istream &istream, c
     }
 
     LuaReader *luaReader = new LuaReader(istream);
-    int error = lua_load(_luaState, luaReadFromIstream, luaReader, streamname) || lua_pcall(_luaState, 0, nbExpectedResults, 0);
+    int error = lua_load(_luaState, luaReadFromIstream, luaReader, streamname);
     delete luaReader;
 
     if(istream.fail())
     {
         _lastError.append("Error while reading '").append(streamname).append("'!");
+        if (error)
+        {
+            lua_pop(_luaState, 1);
+        }
+        return false;
     }
-
     if (error)
     {
-        if (_lastError.empty())
-        {
-            _lastError = lua_tostring(_luaState, -1);
-        }
+        _lastError = lua_tostring(_luaState, -1);
         lua_pop(_luaState, 1);
+        return false;
     }
-    return _lastError.empty();
+    return true;
+}
+
+bool ScriptEngine::exec(unsigned int nbExpectedResults, std::istream &istream, const char *streamname)
+{
+    if (! this->load(istream, streamname))
+    {
+        return false;
+    }
+
+    if (lua_pcall(_luaState, 0, nbExpectedResults, 0))
+    {
+        _lastError = lua_tostring(_luaState, -1);
+        lua_pop(_luaState, 1);
+        return false;
+    }
+    return true;
 }
 
 bool ScriptEngine::exec(ScriptResultHandler &handler, std::istream &istream, const char *streamname)

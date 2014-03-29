@@ -54,6 +54,7 @@ private:
     void init();
     void destroy();
     bool assertEngineReady();
+    bool load(std::istream &istream, const char *streamname);
     bool exec(unsigned int nbExpectedResults, std::istream &istream, const char *streamname = 0);
 
     lua_State *_luaState;

@@ -22,18 +22,24 @@ public:
 class IntegersScriptResultHandler : public ScriptResultHandler
 {
 public:
-    IntegersScriptResultHandler() : ScriptResultHandler(2), _firstInteger(0), _secondInteger(0)
+    IntegersScriptResultHandler(unsigned int expectedResult) : ScriptResultHandler(expectedResult)
     {
+        _results = new int[expectedResult];
+    }
+
+    ~IntegersScriptResultHandler() {
+        delete[] _results;
     }
 
     void handle(lua_State *luaState)
     {
-        _secondInteger = lua_tointeger(luaState, -1);
-        _firstInteger = lua_tointeger(luaState, -2);
+        for (int i = 1; i <= this->expectedResults(); ++i)
+        {
+            _results[this->expectedResults() - i] = lua_tointeger(luaState, -i);
+        }
     }
 
-    unsigned int _firstInteger;
-    unsigned int _secondInteger;
+    int* _results;
 };
 
 
@@ -83,11 +89,16 @@ TEST(ScriptEngine, canExecuteLuaCodeWithNoopScriptHandler)
 
 TEST(ScriptEngine, canExecuteLuaCodeAndUseHandlerToConvertResult)
 {
-    IntegersScriptResultHandler integersScriptResultHandler;
+    IntegersScriptResultHandler integersScriptResultHandler(3);
     osg::ref_ptr<ScriptEngine> scriptEngine = new ScriptEngine();
-    std::istringstream stream("return 1, 2");
+    std::istringstream stream("local result = {}    "
+                              "for i = 1, 10 do     "
+                              "  result[i] = i      "
+                              "end                  "
+                              "return unpack(result)");
 
     ASSERT_TRUE(scriptEngine->exec(integersScriptResultHandler, stream));
-    ASSERT_EQ(1, integersScriptResultHandler._firstInteger);
-    ASSERT_EQ(2, integersScriptResultHandler._secondInteger);
+    ASSERT_EQ(1, integersScriptResultHandler._results[0]);
+    ASSERT_EQ(2, integersScriptResultHandler._results[1]);
+    ASSERT_EQ(3, integersScriptResultHandler._results[2]);
 }
