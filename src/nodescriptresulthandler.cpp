@@ -48,7 +48,7 @@ void NodeScriptResultHandler::handle(lua_State *luaState, unsigned int nbResults
 static osg::Node* convertToOsgNode(lua_State *luaState, int index)
 {
     osg::ref_ptr<osg::Node> node = lua_toOsgNode(luaState, index);
-    if (!node && lua_istable(luaState, index))
+    if (!node && lua_istable(luaState, index) && lua_checkstack(luaState, 2))
     {
         int tableIndex = index >= 0 ? index : index-1;
         osg::ref_ptr<osg::Group> group = new osg::Group;
