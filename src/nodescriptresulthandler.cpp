@@ -34,6 +34,7 @@ void NodeScriptResultHandler::handle(lua_State *luaState, unsigned int nbResults
             osg::Node *node = convertToOsgNode(luaState, -i);
             group->addChild(node);
         }
+
         if (group->getNumChildren() == 1)
         {
             _node = group->getChild(0);
@@ -52,13 +53,17 @@ static osg::Node* convertToOsgNode(lua_State *luaState, int index)
     {
         int tableIndex = index >= 0 ? index : index-1;
         osg::ref_ptr<osg::Group> group = new osg::Group;
+
         lua_pushnil(luaState);  /* first key */
-        while (lua_next(luaState, tableIndex) != 0) {
+        while (lua_next(luaState, tableIndex) != 0)
+        {
             osg::Node *tableNode = convertToOsgNode(luaState, -1);
             group->addChild(tableNode);
             lua_pop(luaState, 1);
         }
-        if (group->getNumChildren() == 1) {
+
+        if (group->getNumChildren() == 1)
+        {
             node = group->getChild(0);
         }
         else if (group->getNumChildren() > 0)
