@@ -54,7 +54,7 @@ static osg::Node* convertToOsgNode(lua_State *luaState, int index)
         osg::ref_ptr<osg::Group> group = new osg::Group;
         lua_pushnil(luaState);  /* first key */
         while (lua_next(luaState, tableIndex) != 0) {
-            osg::Node *tableNode = lua_toOsgNode(luaState, -1);
+            osg::Node *tableNode = convertToOsgNode(luaState, -1);
             group->addChild(tableNode);
             lua_pop(luaState, 1);
         }
