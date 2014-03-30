@@ -3,27 +3,7 @@
 #include <fstream>
 #include "osg/Group"
 #include "scriptloadercallback.h"
-
-osg::Node* lua_toOsgNode(lua_State* L, int index);
-
-class NodeScriptResultHandler : public ScriptResultHandler
-{
-public:
-    NodeScriptResultHandler();
-    void handle(lua_State* luaState);
-
-    osg::ref_ptr<osg::Node> node;
-};
-
-NodeScriptResultHandler::NodeScriptResultHandler() : ScriptResultHandler(1)
-{
-
-}
-
-void NodeScriptResultHandler::handle(lua_State* luaState)
-{
-    node = lua_toOsgNode(luaState, -1);
-}
+#include "nodescriptresulthandler.h"
 
 ScriptLoaderCallback::ScriptLoaderCallback(ScriptEngine *scriptEngine, bool reloadable) :
     _scriptEngine(scriptEngine), _reloadable(reloadable), _fileLoaded(false), _lastModificationDate(0)
@@ -48,7 +28,7 @@ void ScriptLoaderCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
         NodeScriptResultHandler handler;
         if (this->_scriptEngine->exec(handler, ifstream, this->_filename.c_str()))
         {
-            groupNode->addChild(handler.node);
+            groupNode->addChild(handler.getNode());
             this->_lastModificationDate = this->getLastModificationDate();
             this->_fileLoaded = true;
         }

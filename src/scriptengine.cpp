@@ -144,7 +144,8 @@ bool ScriptEngine::exec(unsigned int nbExpectedResults, std::istream &istream, c
         return false;
     }
 
-    if (lua_pcall(_luaState, 0, nbExpectedResults, 0))
+    unsigned int nbResults = (nbExpectedResults == ScriptResultHandler::UNLIMITED_RESULTS) ? LUA_MULTRET : nbExpectedResults;
+    if (lua_pcall(_luaState, 0, nbResults, 0))
     {
         _lastError = lua_tostring(_luaState, -1);
         lua_pop(_luaState, 1);
@@ -155,11 +156,11 @@ bool ScriptEngine::exec(unsigned int nbExpectedResults, std::istream &istream, c
 
 bool ScriptEngine::exec(ScriptResultHandler &handler, std::istream &istream, const char *streamname)
 {
-    if (this->exec(handler.expectedResults(), istream, streamname))
+    int finalStackSize = lua_gettop(this->_luaState);
+    if (this->exec(handler.getExpectedResults(), istream, streamname))
     {
-        int finalStackSize = std::max(static_cast<unsigned int>(0), lua_gettop(this->_luaState) - handler.expectedResults());
-        handler.handle(this->_luaState);
         int nbElementsToPop = std::max(0, lua_gettop(this->_luaState) - finalStackSize);
+        handler.handle(this->_luaState, nbElementsToPop);
         lua_pop(this->_luaState, nbElementsToPop);
 
         assert(lua_gettop(this->_luaState) == finalStackSize);

@@ -11,6 +11,7 @@
 %{
 
 #include "modulemodel.h"
+#include "luabinding.h"
 
 osg::Node* lua_toOsgNode(lua_State* L, int index)
 {

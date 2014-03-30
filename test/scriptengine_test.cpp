@@ -11,7 +11,7 @@ public:
     {
     }
 
-    void handle(lua_State *luaState)
+    void handle(lua_State *luaState, unsigned int nbResults)
     {
         this->_handleInvoked = true;
     }
@@ -22,24 +22,28 @@ public:
 class IntegersScriptResultHandler : public ScriptResultHandler
 {
 public:
-    IntegersScriptResultHandler(unsigned int expectedResult) : ScriptResultHandler(expectedResult)
+    IntegersScriptResultHandler(unsigned int expectedResult = ScriptResultHandler::UNLIMITED_RESULTS) :
+        ScriptResultHandler(expectedResult), _results(0), _nbResults(0)
     {
-        _results = new int[expectedResult];
     }
 
     ~IntegersScriptResultHandler() {
         delete[] _results;
     }
 
-    void handle(lua_State *luaState)
+    void handle(lua_State *luaState, unsigned int nbResults)
     {
-        for (unsigned int i = 1; i <= this->expectedResults(); ++i)
+        delete[] _results;
+        _results = new int[nbResults];
+        this->_nbResults = nbResults;
+        for (unsigned int i = 1; i <= nbResults; ++i)
         {
-            _results[this->expectedResults() - i] = lua_tointeger(luaState, -i);
+            _results[nbResults - i] = lua_tointeger(luaState, -i);
         }
     }
 
     int* _results;
+    unsigned int _nbResults;
 };
 
 
@@ -87,7 +91,7 @@ TEST(ScriptEngine, canExecuteLuaCodeWithNoopScriptHandler)
     ASSERT_TRUE(noopScriptResultHandler._handleInvoked);
 }
 
-TEST(ScriptEngine, canExecuteLuaCodeAndUseHandlerToConvertResult)
+TEST(ScriptEngine, canExecuteLuaCodeAndUseHandlerToConvertResults)
 {
     IntegersScriptResultHandler integersScriptResultHandler(3);
     osg::ref_ptr<ScriptEngine> scriptEngine = new ScriptEngine();
@@ -98,7 +102,20 @@ TEST(ScriptEngine, canExecuteLuaCodeAndUseHandlerToConvertResult)
                               "return unpack(result)");
 
     ASSERT_TRUE(scriptEngine->exec(integersScriptResultHandler, stream));
+    ASSERT_EQ(static_cast<unsigned int>(3), integersScriptResultHandler._nbResults);
     ASSERT_EQ(1, integersScriptResultHandler._results[0]);
     ASSERT_EQ(2, integersScriptResultHandler._results[1]);
     ASSERT_EQ(3, integersScriptResultHandler._results[2]);
+}
+
+TEST(ScriptEngine, canExecuteLuaCodeAndUseHandlerToConvertUnlimitedResults)
+{
+    IntegersScriptResultHandler integersScriptResultHandler;
+    osg::ref_ptr<ScriptEngine> scriptEngine = new ScriptEngine();
+    std::istringstream stream("return 1, 2");
+
+    ASSERT_TRUE(scriptEngine->exec(integersScriptResultHandler, stream));
+    ASSERT_EQ(static_cast<unsigned int>(2), integersScriptResultHandler._nbResults);
+    ASSERT_EQ(1, integersScriptResultHandler._results[0]);
+    ASSERT_EQ(2, integersScriptResultHandler._results[1]);
 }

@@ -35,8 +35,11 @@ generate_lua_wrap("src/modulemodel.i" GENERATED_SOURCES)
 set(SOURCES
     src/modulemodel.h
     src/modulemodel.cpp
+    src/luabinding.h
     src/scriptengine.cpp
     src/scriptengine.h
+    src/nodescriptresulthandler.h
+    src/nodescriptresulthandler.cpp
     src/scriptloadercallback.h
     src/scriptloadercallback.cpp
     ${GENERATED_SOURCES}

@@ -1,5 +1,6 @@
 #ifndef SCRIPTENGINE_H
 #define SCRIPTENGINE_H
+#include <climits>
 #include <string>
 #include <istream>
 #include "osg/Referenced"
@@ -12,12 +13,14 @@ struct lua_State;
 class ScriptResultHandler
 {
 public:
-    ScriptResultHandler(unsigned int expectedResults = 0);
+    static const unsigned int UNLIMITED_RESULTS = UINT_MAX;
+
+    ScriptResultHandler(unsigned int getExpectedResults = UNLIMITED_RESULTS);
     virtual ~ScriptResultHandler();
 
-    virtual void handle(lua_State* luaState) = 0;
+    virtual void handle(lua_State* luaState, unsigned int nbResults) = 0;
 
-    unsigned int expectedResults()
+    unsigned int getExpectedResults()
     {
         return _expectedResults;
     }
