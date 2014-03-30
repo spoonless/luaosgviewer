@@ -30,10 +30,11 @@ endmacro()
 ###############################################
 # main project settings
 ###############################################
-generate_lua_wrap("src/module.i" GENERATED_SOURCES)
+generate_lua_wrap("src/modulemodel.i" GENERATED_SOURCES)
 
 set(SOURCES
-    src/module.cpp
+    src/modulemodel.h
+    src/modulemodel.cpp
     src/scriptengine.cpp
     src/scriptengine.h
     src/scriptloadercallback.h

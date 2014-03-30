@@ -6,7 +6,7 @@
 #define BUFFER_READER 1024
 
 extern "C" {
-int luaopen_geometry(lua_State*);
+int luaopen_model(lua_State*);
 }
 
 class LuaReader {
@@ -81,7 +81,7 @@ void ScriptEngine::init()
     openlib(_luaState, "table", luaopen_table);
     openlib(_luaState, "debug", luaopen_debug);
     openlib(_luaState, "jit", luaopen_jit);
-    openlib(_luaState, "geometry", luaopen_geometry);
+    openlib(_luaState, "model", luaopen_model);
 }
 
 void ScriptEngine::destroy()

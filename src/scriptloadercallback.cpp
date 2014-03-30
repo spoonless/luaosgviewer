@@ -4,7 +4,7 @@
 #include "osg/Group"
 #include "scriptloadercallback.h"
 
-osg::Node* lua_toNode(lua_State* L);
+osg::Node* lua_toOsgNode(lua_State* L, int index);
 
 class NodeScriptResultHandler : public ScriptResultHandler
 {
@@ -22,7 +22,7 @@ NodeScriptResultHandler::NodeScriptResultHandler() : ScriptResultHandler(1)
 
 void NodeScriptResultHandler::handle(lua_State* luaState)
 {
-    node = lua_toNode(luaState);
+    node = lua_toOsgNode(luaState, -1);
 }
 
 ScriptLoaderCallback::ScriptLoaderCallback(ScriptEngine *scriptEngine, bool reloadable) :
