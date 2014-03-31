@@ -1,13 +1,10 @@
 #include <cassert>
 #include <algorithm>
-#include "scriptengine.h"
 #include "lua.hpp"
+#include "luabinding.h"
+#include "scriptengine.h"
 
 #define BUFFER_READER 1024
-
-extern "C" {
-int luaopen_model(lua_State*);
-}
 
 class LuaReader {
 public :

@@ -20,6 +20,19 @@ osg::Node* lua_toOsgNode(lua_State* L, int index)
     return (SWIG_IsOK(res) && model) ? model->getNode() : 0;
 }
 
+void lua_pushOsgNode(lua_State* L, osg::Node *node)
+{
+    if (!node)
+    {
+        lua_pushnil(L);
+    }
+    else
+    {
+        binding::Model *model = new binding::Model(node);
+        SWIG_NewPointerObj(L, model, SWIGTYPE_p_binding__Model, 1);
+    }
+}
+
 %}
 
 %attribute(binding::Model, const char*, name, getName, setName);

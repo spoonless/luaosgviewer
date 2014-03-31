@@ -62,6 +62,7 @@ if(BUILD_UNITTESTS)
     add_executable(unittest
                    test/main.cpp
                    test/scriptengine_test.cpp
+                   test/nodescriptresulthandler_test.cpp
                    ${SOURCES}
     )
     config_project( unittest LUAJIT GTEST )

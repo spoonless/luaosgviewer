@@ -1,6 +1,6 @@
 #include <fstream>
-#include "osg/ref_ptr"
 #include "gtest/gtest.h"
+#include "osg/ref_ptr"
 #include "scriptengine.h"
 #include "lua.hpp"
 
