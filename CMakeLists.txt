@@ -21,7 +21,7 @@ find_package( osgUtil )
 find_package( osgViewer )
 find_package( osgGA )
 
-macro( config_project PROJNAME )
+macro( config_executable PROJNAME )
     foreach(LIBNAME ${ARGN})
         include_directories( ${${LIBNAME}_INCLUDE_DIR} )
         target_link_libraries( ${PROJNAME} ${${LIBNAME}_LIBRARY} )
@@ -51,8 +51,8 @@ add_executable(MyProject
     ${SOURCES}
 )
 
-config_project( MyProject LUAJIT )
-config_project( MyProject OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER )
+config_executable(MyProject LUAJIT)
+config_executable(MyProject OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER)
 
 ###############################################
 # unit tests project settings
@@ -66,8 +66,14 @@ if(BUILD_UNITTESTS)
                    tests/nodescriptresulthandler_test.cpp
                    ${SOURCES}
     )
-    config_project( unittest LUAJIT GTEST )
-    config_project( unittest OPENTHREADS OSG OSGDB)
+    config_executable(unittest LUAJIT GTEST)
+    config_executable(unittest OPENTHREADS OSG OSGDB)
+    
+    add_custom_target(test
+                      "${CMAKE_CURRENT_BINARY_DIR}/unittest"
+                      WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/tests")
+    add_dependencies(test unittest)
+    
     if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Coverage")
         include("CodeCoverage")
         setup_target_for_coverage(coverage unittest coverage)
