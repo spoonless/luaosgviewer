@@ -153,6 +153,7 @@ bool ScriptEngine::exec(unsigned int nbExpectedResults, std::istream &istream, c
 
 bool ScriptEngine::exec(ScriptResultHandler &handler, std::istream &istream, const char *streamname)
 {
+    bool result = false;
     int finalStackSize = lua_gettop(this->_luaState);
     if (this->exec(handler.getExpectedResults(), istream, streamname))
     {
@@ -160,8 +161,8 @@ bool ScriptEngine::exec(ScriptResultHandler &handler, std::istream &istream, con
         handler.handle(this->_luaState, nbElementsToPop);
         lua_pop(this->_luaState, nbElementsToPop);
 
-        assert(lua_gettop(this->_luaState) == finalStackSize);
-        return true;
+        result = true;
     }
-    return false;
+    assert(lua_gettop(this->_luaState) == finalStackSize);
+    return result;
 }

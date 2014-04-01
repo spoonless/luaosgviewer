@@ -119,3 +119,14 @@ TEST(ScriptEngine, canExecuteLuaCodeAndUseHandlerToConvertUnlimitedResults)
     ASSERT_EQ(1, integersScriptResultHandler._results[0]);
     ASSERT_EQ(2, integersScriptResultHandler._results[1]);
 }
+
+TEST(ScriptEngine, canExecuteLuaScriptAndDetectFailure)
+{
+    NoopScriptResultHandler handler;
+    osg::ref_ptr<ScriptEngine> scriptEngine = new ScriptEngine();
+    std::istringstream stream("assert(false)");
+
+    ASSERT_FALSE(scriptEngine->exec(handler, stream, "failed script"));
+    ASSERT_EQ("[string \"failed script\"]:1: assertion failed!", scriptEngine->lastError());
+    ASSERT_FALSE(handler._handleInvoked);
+}
