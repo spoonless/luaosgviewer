@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-if(CMAKE_BUILD_TOOL MATCHES "make")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
+if(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 endif()
@@ -9,9 +11,8 @@ project(MyProject)
 
 option(BUILD_UNITTESTS "Build all unit tests." OFF)
 
-
-include("cmake/EmbedLuajit.cmake")
-include("cmake/LuaSWIG.cmake")
+include("EmbedLuajit")
+include("LuaSWIG")
 
 find_package( OpenThreads )
 find_package( osg )
@@ -57,14 +58,18 @@ config_project( MyProject OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER )
 # unit tests project settings
 ###############################################
 if(BUILD_UNITTESTS)
-    include("cmake/EmbedGtest.cmake")
+    include("EmbedGtest")
     include_directories("src")
     add_executable(unittest
-                   test/main.cpp
-                   test/scriptengine_test.cpp
-                   test/nodescriptresulthandler_test.cpp
+                   tests/main.cpp
+                   tests/scriptengine_test.cpp
+                   tests/nodescriptresulthandler_test.cpp
                    ${SOURCES}
     )
     config_project( unittest LUAJIT GTEST )
     config_project( unittest OPENTHREADS OSG OSGDB)
+    if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Coverage")
+        include("CodeCoverage")
+        setup_target_for_coverage(coverage unittest coverage)
+    endif()
 endif()
