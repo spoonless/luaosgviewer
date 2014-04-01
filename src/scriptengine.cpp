@@ -119,10 +119,9 @@ bool ScriptEngine::load(std::istream &istream, const char *streamname)
     if(istream.fail())
     {
         _lastError.append("Error while reading '").append(streamname).append("'!");
-        if (error)
-        {
-            lua_pop(_luaState, 1);
-        }
+        // now, one error message or one function is on the stack
+        // we must remove it
+        lua_pop(_luaState, 1);
         return false;
     }
     if (error)

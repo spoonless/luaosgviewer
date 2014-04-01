@@ -81,6 +81,17 @@ TEST(ScriptEngine, canGetLastErrorWhenFileDoesNotExist)
     ASSERT_EQ("Error while reading 'nonExistingFile'!", scriptEngine->lastError());
 }
 
+TEST(ScriptEngine, cannotExecScriptWithHandlerWhenFileDoesNotExist)
+{
+    osg::ref_ptr<ScriptEngine> scriptEngine = new ScriptEngine();
+    std::ifstream nonExistingFile("non_existing_file");
+    NoopScriptResultHandler handler;
+
+    EXPECT_FALSE(scriptEngine->exec(handler, nonExistingFile, "nonExistingFile"));
+    ASSERT_EQ("Error while reading 'nonExistingFile'!", scriptEngine->lastError());
+    ASSERT_FALSE(handler._handleInvoked);
+}
+
 TEST(ScriptEngine, canExecuteLuaCodeWithNoopScriptHandler)
 {
     NoopScriptResultHandler noopScriptResultHandler;
