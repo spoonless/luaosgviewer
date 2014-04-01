@@ -1,13 +1,8 @@
 %nodefaultctor;
 
-#ifndef %mangle
-#define %mangle(Type...) #@Type
-#endif
-
-%include <typemaps/attribute.swg>
+%include <attribute.i>
 
 %module model
-
 %{
 
 #include "modulemodel.h"
