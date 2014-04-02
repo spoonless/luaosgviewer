@@ -4,7 +4,7 @@
 #include "luabinding.h"
 #include "scriptengine.h"
 
-#define BUFFER_READER 1024
+#define BUFFER_READER 512
 
 class LuaReader {
 public :
@@ -32,7 +32,7 @@ int LuaReader::read()
     {
         return 0;
     }
-    _istream.readsome(_buffer, BUFFER_READER);
+    _istream.read(_buffer, BUFFER_READER);
     return _istream.gcount();
 }
 
@@ -116,7 +116,7 @@ bool ScriptEngine::load(std::istream &istream, const char *streamname)
     int error = lua_load(_luaState, luaReadFromIstream, luaReader, streamname);
     delete luaReader;
 
-    if(istream.fail())
+    if(!istream.eof() && istream.fail())
     {
         _lastError.append("Error while reading '").append(streamname).append("'!");
         // now, one error message or one function is on the stack
