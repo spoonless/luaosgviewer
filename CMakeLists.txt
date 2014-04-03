@@ -31,6 +31,7 @@ endmacro()
 ###############################################
 # main project settings
 ###############################################
+include_directories("src")
 generate_lua_wrap("src/modulemodel.i" GENERATED_SOURCES)
 
 set(SOURCES

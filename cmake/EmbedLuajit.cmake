@@ -1,4 +1,9 @@
 include(ExternalProject)
+
+if(CMAKE_CROSSCOMPILING AND CMAKE_SYSTEM_NAME STREQUAL Windows)
+  set(LUAJIT_CROSSCOMPILING_OPTIONS HOST_CC=gcc CROSS=i586-mingw32msvc- TARGET_SYS=${CMAKE_SYSTEM_NAME})
+endif()
+
 ###############################################
 # Download, compile and install locally luajit
 ###############################################
@@ -10,7 +15,7 @@ ExternalProject_Add(
   PREFIX "${CMAKE_CURRENT_BINARY_DIR}/luajit"
   CONFIGURE_COMMAND ""
   BUILD_IN_SOURCE 1
-  BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} CFLAGS="-DLUAJIT_DISABLE_FFI" BUILDMODE=static
+  BUILD_COMMAND ${CMAKE_MAKE_PROGRAM} CFLAGS=-DLUAJIT_DISABLE_FFI BUILDMODE=static ${LUAJIT_CROSSCOMPILING_OPTIONS}
   INSTALL_COMMAND ""
 )
 
