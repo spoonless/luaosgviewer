@@ -29,12 +29,13 @@ macro( config_executable PROJNAME )
 endmacro()
 
 ###############################################
-# main project settings
+# main sources settings
 ###############################################
+# necessary for mingw32
 include_directories("src")
 generate_lua_wrap("src/ModelLibrary.i" GENERATED_SOURCES)
 
-set(SOURCES
+add_library(core_sources STATIC
     src/ModelLibrary.h
     src/ModelLibrary.cpp
     src/luabinding.h
@@ -49,11 +50,13 @@ set(SOURCES
     ${GENERATED_SOURCES}
 )
 
+###############################################
+# main executable settings
+###############################################
 add_executable(MyProject
     src/main.cpp
-    ${SOURCES}
 )
-
+target_link_libraries(MyProject core_sources)
 config_executable(MyProject LUAJIT)
 config_executable(MyProject OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER)
 
@@ -67,8 +70,8 @@ if(BUILD_UNITTESTS)
                    tests/main.cpp
                    tests/scriptengine_test.cpp
                    tests/nodescriptresulthandler_test.cpp
-                   ${SOURCES}
     )
+    target_link_libraries(unittest core_sources)
     config_executable(unittest LUAJIT GTEST)
     config_executable(unittest OPENTHREADS OSG OSGDB)
     
