@@ -3,7 +3,7 @@
 #include <fstream>
 #include "osg/Group"
 #include "osgViewer/Viewer"
-#include "scriptloadercallback.h"
+#include "ScriptLoaderCallback.h"
 
 int main (int argc, const char** argv) {
     if (argc > 1) {

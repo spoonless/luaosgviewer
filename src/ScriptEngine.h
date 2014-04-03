@@ -4,8 +4,7 @@
 #include <string>
 #include <istream>
 #include "osg/Referenced"
-
-struct lua_State;
+#include "LuaState.h"
 
 /**
  * @brief The ScriptResultHandler class
@@ -18,7 +17,7 @@ public:
     ScriptResultHandler(unsigned int getExpectedResults = UNLIMITED_RESULTS);
     virtual ~ScriptResultHandler();
 
-    virtual void handle(lua_State* luaState, unsigned int nbResults) = 0;
+    virtual void handle(LuaState &luaState, unsigned int nbResults) = 0;
 
     unsigned int getExpectedResults()
     {
@@ -54,13 +53,11 @@ protected:
 private:
     ScriptEngine(const ScriptEngine&);
     ScriptEngine& operator = (const ScriptEngine&);
-    void init();
-    void destroy();
     bool assertEngineReady();
     bool load(std::istream &istream, const char *streamname);
     bool exec(unsigned int nbExpectedResults, std::istream &istream, const char *streamname = 0);
 
-    lua_State *_luaState;
+    LuaState _luaState;
     std::string _lastError;
 };
 

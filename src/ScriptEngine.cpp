@@ -1,8 +1,7 @@
 #include <cassert>
 #include <algorithm>
 #include "lua.hpp"
-#include "luabinding.h"
-#include "scriptengine.h"
+#include "ScriptEngine.h"
 
 #define BUFFER_READER 512
 
@@ -43,13 +42,6 @@ static const char * luaReadFromIstream (lua_State *L, void *data, size_t *size)
     return *size > 0 ? readerState->buffer() : 0;
 }
 
-static void openlib(lua_State *L, const char *name, lua_CFunction func)
-{
-    lua_pushcfunction(L, func);
-    lua_pushstring(L, name);
-    lua_call(L, 1, 0);
-}
-
 ScriptResultHandler::ScriptResultHandler(unsigned int expectedResults) : _expectedResults(expectedResults)
 {
 }
@@ -58,41 +50,17 @@ ScriptResultHandler::~ScriptResultHandler()
 {
 }
 
-ScriptEngine::ScriptEngine() : _luaState(0)
+ScriptEngine::ScriptEngine()
 {
-    this->init();
 }
 
 ScriptEngine::~ScriptEngine()
 {
-    this->destroy();
-}
-
-void ScriptEngine::init()
-{
-    this->destroy();
-    _luaState = luaL_newstate();
-    openlib(_luaState, "", luaopen_base);
-    openlib(_luaState, "math", luaopen_math);
-    openlib(_luaState, "string", luaopen_string);
-    openlib(_luaState, "table", luaopen_table);
-    openlib(_luaState, "debug", luaopen_debug);
-    openlib(_luaState, "jit", luaopen_jit);
-    openlib(_luaState, "model", luaopen_model);
-}
-
-void ScriptEngine::destroy()
-{
-    if (_luaState)
-    {
-        lua_close(_luaState);
-        _luaState = 0;
-    }
 }
 
 bool ScriptEngine::assertEngineReady()
 {
-    if (! _luaState)
+    if (! _luaState.good())
     {
         _lastError = "Script engine is not ready!";
         return false;

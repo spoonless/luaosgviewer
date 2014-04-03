@@ -32,18 +32,20 @@ endmacro()
 # main project settings
 ###############################################
 include_directories("src")
-generate_lua_wrap("src/modulemodel.i" GENERATED_SOURCES)
+generate_lua_wrap("src/ModelLibrary.i" GENERATED_SOURCES)
 
 set(SOURCES
-    src/modulemodel.h
-    src/modulemodel.cpp
+    src/ModelLibrary.h
+    src/ModelLibrary.cpp
     src/luabinding.h
-    src/scriptengine.cpp
-    src/scriptengine.h
-    src/nodescriptresulthandler.h
-    src/nodescriptresulthandler.cpp
-    src/scriptloadercallback.h
-    src/scriptloadercallback.cpp
+    src/LuaState.h
+    src/LuaState.cpp
+    src/ScriptEngine.cpp
+    src/ScriptEngine.h
+    src/NodeScriptResultHandler.h
+    src/NodeScriptResultHandler.cpp
+    src/ScriptLoaderCallback.h
+    src/ScriptLoaderCallback.cpp
     ${GENERATED_SOURCES}
 )
 

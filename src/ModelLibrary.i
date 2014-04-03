@@ -5,8 +5,8 @@
 %module model
 %{
 
-#include "modulemodel.h"
 #include "luabinding.h"
+#include "ModelLibrary.h"
 
 osg::Node* lua_toOsgNode(lua_State* L, int index)
 {

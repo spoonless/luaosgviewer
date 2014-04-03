@@ -1,6 +1,6 @@
 #include "osg/Group"
 #include "lua.hpp"
-#include "nodescriptresulthandler.h"
+#include "NodeScriptResultHandler.h"
 #include "luabinding.h"
 
 static osg::Node* convertToOsgNode(lua_State *luaState, int index);
@@ -16,7 +16,7 @@ NodeScriptResultHandler::~NodeScriptResultHandler()
 
 }
 
-void NodeScriptResultHandler::handle(lua_State *luaState, unsigned int nbResults)
+void NodeScriptResultHandler::handle(LuaState &luaState, unsigned int nbResults)
 {
     if (nbResults == 0)
     {

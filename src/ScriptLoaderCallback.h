@@ -3,7 +3,7 @@
 
 #include <time.h>
 #include "osg/NodeCallback"
-#include "scriptengine.h"
+#include "ScriptEngine.h"
 
 class ScriptLoaderCallback : public osg::NodeCallback
 {

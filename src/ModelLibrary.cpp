@@ -1,5 +1,5 @@
 #include "osgDB/ReadFile"
-#include "modulemodel.h"
+#include "ModelLibrary.h"
 
 binding::Model::Model(osg::Node *node) : _node(node)
 {

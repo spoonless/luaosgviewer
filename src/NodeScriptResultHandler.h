@@ -3,7 +3,7 @@
 
 #include "osg/ref_ptr"
 #include "osg/Node"
-#include "scriptengine.h"
+#include "ScriptEngine.h"
 
 class NodeScriptResultHandler : public ScriptResultHandler
 {
@@ -11,7 +11,7 @@ public:
     NodeScriptResultHandler();
     ~NodeScriptResultHandler();
 
-    void handle(lua_State* luaState, unsigned int nbResults);
+    void handle(LuaState &luaState, unsigned int nbResults);
 
     osg::Node* getNode()
     {

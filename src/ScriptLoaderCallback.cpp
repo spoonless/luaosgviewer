@@ -2,8 +2,8 @@
 #include <sys/stat.h>
 #include <fstream>
 #include "osg/Group"
-#include "scriptloadercallback.h"
-#include "nodescriptresulthandler.h"
+#include "ScriptLoaderCallback.h"
+#include "NodeScriptResultHandler.h"
 
 ScriptLoaderCallback::ScriptLoaderCallback(ScriptEngine *scriptEngine, bool reloadable) :
     _scriptEngine(scriptEngine), _reloadable(reloadable), _fileLoaded(false), _lastModificationDate(0)

@@ -1,8 +1,8 @@
 #include <fstream>
+#include "lua.hpp"
 #include "gtest/gtest.h"
 #include "osg/ref_ptr"
-#include "scriptengine.h"
-#include "lua.hpp"
+#include "ScriptEngine.h"
 
 class NoopScriptResultHandler : public ScriptResultHandler
 {
@@ -11,7 +11,7 @@ public:
     {
     }
 
-    void handle(lua_State *luaState, unsigned int nbResults)
+    void handle(LuaState &luaState, unsigned int nbResults)
     {
         this->_handleInvoked = true;
     }
@@ -31,7 +31,7 @@ public:
         delete[] _results;
     }
 
-    void handle(lua_State *luaState, unsigned int nbResults)
+    void handle(LuaState &luaState, unsigned int nbResults)
     {
         delete[] _results;
         _results = new int[nbResults];
