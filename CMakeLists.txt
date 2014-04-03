@@ -50,6 +50,8 @@ add_library(core_sources STATIC
     ${GENERATED_SOURCES}
 )
 
+config_executable(core_sources LUAJIT OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER)
+
 ###############################################
 # main executable settings
 ###############################################
@@ -57,8 +59,6 @@ add_executable(MyProject
     src/main.cpp
 )
 target_link_libraries(MyProject core_sources)
-config_executable(MyProject LUAJIT)
-config_executable(MyProject OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER)
 
 ###############################################
 # unit tests project settings
@@ -72,8 +72,7 @@ if(BUILD_UNITTESTS)
                    tests/nodescriptresulthandler_test.cpp
     )
     target_link_libraries(unittest core_sources)
-    config_executable(unittest LUAJIT GTEST)
-    config_executable(unittest OPENTHREADS OSG OSGDB)
+    config_executable(unittest GTEST)
     
     add_custom_target(test
                       "${CMAKE_CURRENT_BINARY_DIR}/unittest"
