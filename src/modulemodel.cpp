@@ -9,7 +9,7 @@ binding::Model::Model(const Model &model) : _node(model._node)
 {
 }
 
-binding::Model* binding::loadModel(const char* filename)
+binding::Model* binding::ModelLoader::operator()(const char* filename)
 {
     osg::Node *node = osgDB::readNodeFile(filename);
     return node == 0 ? 0 : new binding::Model(node);

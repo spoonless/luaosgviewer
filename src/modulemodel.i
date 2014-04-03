@@ -30,6 +30,12 @@ void lua_pushOsgNode(lua_State* L, osg::Node *node)
 
 %}
 
+%init
+%{
+    SWIG_NewPointerObj(L, new binding::ModelLoader, SWIGTYPE_p_binding__ModelLoader, 1);
+    lua_setfield(L, -2, "load");
+%}
+
 %attribute(binding::Model, const char*, name, getName, setName);
 
 namespace binding
@@ -43,8 +49,11 @@ public:
     void setName(const char *name);
 };
 
-%newobject loadModel;
-%rename(load) loadModel;
-Model* loadModel(const char* filename);
+class ModelLoader
+{
+public:
+    %newobject operator();
+    Model* operator()(const char* filename);
+};
 
 }

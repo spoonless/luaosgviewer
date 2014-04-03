@@ -40,7 +40,12 @@ private:
     osg::ref_ptr<osg::Node> _node;
 };
 
-Model* loadModel(const char* filename);
+class ModelLoader
+{
+public:
+    Model* operator()(const char* filename);
+};
+
 
 }
 

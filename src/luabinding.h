@@ -15,5 +15,4 @@ osg::Node* lua_toOsgNode(lua_State* L, int index);
 
 void lua_pushOsgNode(lua_State* L, osg::Node *node);
 
-
 #endif // LUABINDING_H
