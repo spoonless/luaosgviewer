@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <iostream>
 #include <fstream>
 #include "osg/Group"
 #include "ScriptLoaderCallback.h"
@@ -31,6 +32,9 @@ void ScriptLoaderCallback::operator()(osg::Node* node, osg::NodeVisitor* nv)
             groupNode->addChild(handler.getNode());
             this->_lastModificationDate = this->getLastModificationDate();
             this->_fileLoaded = true;
+        }
+        else {
+            std::cerr << this->_scriptEngine->lastError() << std::endl;
         }
     }
     else if (this->_reloadable)
