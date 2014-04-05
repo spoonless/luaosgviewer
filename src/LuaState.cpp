@@ -1,6 +1,11 @@
 #include "lua.hpp"
 #include "LuaState.h"
-#include "luabinding.h"
+
+extern "C" {
+
+int luaopen_model(lua_State*);
+
+}
 
 static void openlib(lua_State *L, const char *name, lua_CFunction func)
 {

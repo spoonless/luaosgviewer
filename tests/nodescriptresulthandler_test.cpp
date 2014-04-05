@@ -1,7 +1,7 @@
 #include "lua.hpp"
 #include "gtest/gtest.h"
 #include "osg/Group"
-#include "luabinding.h"
+#include "osgLuaBinding.h"
 #include "NodeScriptResultHandler.h"
 
 TEST(NodeScriptResultHandler, handleNoResult)

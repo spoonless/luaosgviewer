@@ -1,7 +1,7 @@
 #ifndef SCRIPTLOADERCALLBACK_H
 #define SCRIPTLOADERCALLBACK_H
 
-#include <time.h>
+#include <ctime>
 #include "osg/NodeCallback"
 #include "ScriptEngine.h"
 

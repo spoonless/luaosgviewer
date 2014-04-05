@@ -5,10 +5,10 @@
 %module model
 %{
 
-#include "luabinding.h"
+#include "osgLuaBinding.h"
 #include "ModelLibrary.h"
 
-osg::Node* lua_toOsgNode(lua_State* L, int index)
+osg::Node* swig_lua_toOsgNode(lua_State* L, int index)
 {
     binding::Model *model = 0;
     int res = SWIG_ConvertPtr(L, index, (void **)(&model),SWIGTYPE_p_binding__Model, 0);

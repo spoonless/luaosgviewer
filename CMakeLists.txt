@@ -38,7 +38,8 @@ generate_lua_wrap("src/ModelLibrary.i" GENERATED_SOURCES)
 add_library(core_sources STATIC
     src/ModelLibrary.h
     src/ModelLibrary.cpp
-    src/luabinding.h
+    src/osgLuaBinding.h
+    src/osgLuaBinding.cpp
     src/LuaState.h
     src/LuaState.cpp
     src/ScriptEngine.cpp
