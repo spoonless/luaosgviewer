@@ -4,7 +4,7 @@
 #include "osg/ref_ptr"
 #include "ScriptEngine.h"
 
-class NoopScriptResultHandler : public ScriptResultHandler
+class NoopScriptResultHandler : public LuaResultHandler
 {
 public:
     NoopScriptResultHandler() : _handleInvoked(false)
@@ -19,11 +19,11 @@ public:
     bool _handleInvoked;
 };
 
-class IntegersScriptResultHandler : public ScriptResultHandler
+class IntegersScriptResultHandler : public LuaResultHandler
 {
 public:
-    IntegersScriptResultHandler(unsigned int expectedResult = ScriptResultHandler::UNLIMITED_RESULTS) :
-        ScriptResultHandler(expectedResult), _results(0), _nbResults(0)
+    IntegersScriptResultHandler(unsigned int expectedResult = LuaResultHandler::UNLIMITED_RESULTS) :
+        LuaResultHandler(expectedResult), _results(0), _nbResults(0)
     {
     }
 

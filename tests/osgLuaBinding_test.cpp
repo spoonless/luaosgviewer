@@ -1,4 +1,3 @@
-#include "string"
 #include "lua.hpp"
 #include "gtest/gtest.h"
 #include "osgLuaBinding.h"
@@ -6,11 +5,10 @@
 
 static void pushTestString(LuaState &luaState, const char *test)
 {
-    std::string statement("test = ");
-    statement.append(test);
+    std::stringstream stream;
+    stream << "test = " << test;
 
-    ASSERT_TRUE(luaL_loadstring(luaState, statement.c_str()) == 0);
-    ASSERT_TRUE(lua_pcall(luaState, 0, 0, 0) == 0);
+    ASSERT_TRUE(luaState.exec(stream));
     lua_getglobal(luaState, "test");
 }
 

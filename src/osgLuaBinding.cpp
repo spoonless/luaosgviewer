@@ -1,5 +1,5 @@
 #include "lua.hpp"
-#include <osg/MatrixTransform>
+#include "osg/MatrixTransform"
 #include "osgLuaBinding.h"
 
 static inline int lua_decrement(int index)

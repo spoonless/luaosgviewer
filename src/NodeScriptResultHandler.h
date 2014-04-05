@@ -3,9 +3,9 @@
 
 #include "osg/ref_ptr"
 #include "osg/Node"
-#include "ScriptEngine.h"
+#include "LuaState.h"
 
-class NodeScriptResultHandler : public ScriptResultHandler
+class NodeScriptResultHandler : public LuaResultHandler
 {
 public:
     NodeScriptResultHandler();

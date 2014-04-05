@@ -3,7 +3,7 @@
 
 
 NodeScriptResultHandler::NodeScriptResultHandler() :
-    ScriptResultHandler(ScriptResultHandler::UNLIMITED_RESULTS)
+    LuaResultHandler(LuaResultHandler::UNLIMITED_RESULTS)
 {
 
 }
