@@ -2,6 +2,11 @@
 #include <osg/MatrixTransform>
 #include "osgLuaBinding.h"
 
+static inline int lua_decrement(int index)
+{
+    return index < 0 && index > LUA_REGISTRYINDEX ? index-1 : index;
+}
+
 osg::Node* swig_lua_toOsgNode(lua_State* L, int index);
 
 osg::Node* lua_toOsgNode(lua_State *L, int index)
@@ -12,7 +17,7 @@ osg::Node* lua_toOsgNode(lua_State *L, int index)
         osg::ref_ptr<osg::Group> group = new osg::Group;
 
         lua_pushnil(L);  /* first key */
-        int tableIndex = index >= 0 ? index : index-1;
+        int tableIndex = lua_decrement(index);
         while (lua_next(L, tableIndex) != 0)
         {
             osg::ref_ptr<osg::Node> tableNode = lua_toOsgNode(L, -1);
@@ -67,7 +72,7 @@ const V lua_toOsgVec(lua_State *L, int index, char firstComponentName)
         const unsigned int vecComponentCompleteMask = (1 << vec.num_components) - 1;
 
         lua_pushnil(L);  /* first key */
-        int tableIndex = index >= 0 ? index : index-1;
+        int tableIndex = lua_decrement(index);
         while (lua_next(L, tableIndex) != 0)
         {
             int vecComponentPos = -1;
