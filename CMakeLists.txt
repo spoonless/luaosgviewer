@@ -71,6 +71,7 @@ if(BUILD_UNITTESTS)
                    tests/main.cpp
                    tests/scriptengine_test.cpp
                    tests/nodescriptresulthandler_test.cpp
+                   tests/osgLuaBinding_test.cpp
     )
     target_link_libraries(unittest core_sources)
     config_executable(unittest GTEST)
