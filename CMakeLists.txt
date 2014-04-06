@@ -77,7 +77,7 @@ if(BUILD_UNITTESTS)
     config_executable(unittest GTEST)
     
     add_custom_target(test
-                      "${CMAKE_CURRENT_BINARY_DIR}/unittest"
+                      "$<TARGET_FILE:unittest>"
                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/tests")
     add_dependencies(test unittest)
     
