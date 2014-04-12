@@ -5,7 +5,7 @@
 
 extern "C" {
 
-int luaopen_model(lua_State*);
+int luaopen_entity(lua_State*);
 
 }
 
@@ -74,7 +74,7 @@ LuaState::LuaState()
         openlib(_luaState, "table", luaopen_table);
         openlib(_luaState, "debug", luaopen_debug);
         openlib(_luaState, "jit", luaopen_jit);
-        openlib(_luaState, "model", luaopen_model);
+        openlib(_luaState, "entity", luaopen_entity);
     }
 }
 

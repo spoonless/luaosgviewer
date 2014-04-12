@@ -1,8 +1,7 @@
 #ifndef LUABINDING_H
 #define LUABINDING_H
 
-#include "osg/Node"
-#include "osg/Group"
+#include "EntityNode.h"
 #include "osg/Vec3"
 
 extern "C" {
@@ -12,7 +11,8 @@ struct lua_State;
 }
 
 osg::Node* lua_toOsgNode(lua_State *L, int index);
-void lua_pushOsgNode(lua_State* L, osg::Node *node);
+
+void lua_pushNode(lua_State *L, EntityNode *node);
 
 osg::Group* lua_toOsgMatrixTransform(lua_State *L, int index);
 

@@ -33,11 +33,11 @@ endmacro()
 ###############################################
 # necessary for mingw32
 include_directories("src")
-generate_lua_wrap("src/ModelLibrary.i" GENERATED_SOURCES)
+generate_lua_wrap("src/EntityLibrary.i" GENERATED_SOURCES)
 
 add_library(core_sources STATIC
-    src/ModelLibrary.h
-    src/ModelLibrary.cpp
+    src/EntityNode.h
+    src/EntityNode.cpp
     src/osgLuaBinding.h
     src/osgLuaBinding.cpp
     src/LuaState.h

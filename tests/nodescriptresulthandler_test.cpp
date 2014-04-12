@@ -1,5 +1,6 @@
 #include "lua.hpp"
 #include "gtest/gtest.h"
+#include "osg/observer_ptr"
 #include "osg/Group"
 #include "osgLuaBinding.h"
 #include "NodeScriptResultHandler.h"
@@ -17,8 +18,9 @@ TEST(NodeScriptResultHandler, handleNoResult)
 TEST(NodeScriptResultHandler, handleOneResult)
 {
     LuaState luaState;
-    osg::ref_ptr<osg::Node> node = new osg::Node;
-    lua_pushOsgNode(luaState, node);
+
+    osg::ref_ptr<EntityNode> node = new EntityNode;
+    lua_pushNode(luaState, node);
 
     NodeScriptResultHandler handler;
     handler.handle(luaState, 1);
@@ -27,13 +29,32 @@ TEST(NodeScriptResultHandler, handleOneResult)
     ASSERT_EQ(node, handler.getNode());
 }
 
+TEST(NodeScriptResultHandler, handleOneResultAndMemoryHandledProperly)
+{
+    LuaState luaState;
+
+    osg::observer_ptr<EntityNode> weakptr;
+    {
+        osg::ref_ptr<EntityNode> node = new EntityNode;
+        lua_pushNode(luaState, node);
+        weakptr = node;
+    }
+
+    NodeScriptResultHandler handler;
+    handler.handle(luaState, 1);
+
+    ASSERT_EQ(1, lua_gettop(luaState));
+    ASSERT_TRUE(weakptr.valid());
+    ASSERT_EQ(weakptr.get(), handler.getNode());
+}
+
 TEST(NodeScriptResultHandler, handleTwoResultsAsGroupNode)
 {
     LuaState luaState;
-    osg::ref_ptr<osg::Node> node1 = new osg::Node;
-    osg::ref_ptr<osg::Node> node2 = new osg::Node;
-    lua_pushOsgNode(luaState, node1);
-    lua_pushOsgNode(luaState, node2);
+    osg::ref_ptr<EntityNode> node1 = new EntityNode;
+    osg::ref_ptr<EntityNode> node2 = new EntityNode;
+    lua_pushNode(luaState, node1);
+    lua_pushNode(luaState, node2);
 
     NodeScriptResultHandler handler;
     handler.handle(luaState, 2);
@@ -51,9 +72,9 @@ TEST(NodeScriptResultHandler, handleTwoResultsAsGroupNode)
 TEST(NodeScriptResultHandler, handleCanReduceResultIfOnlyOneIsNode)
 {
     LuaState luaState;
-    osg::ref_ptr<osg::Node> node = new osg::Node;
+    osg::ref_ptr<EntityNode> node = new EntityNode;
     lua_pushnumber(luaState, 999);
-    lua_pushOsgNode(luaState, node);
+    lua_pushNode(luaState, node);
 
     NodeScriptResultHandler handler;
     handler.handle(luaState, 2);
@@ -79,15 +100,15 @@ TEST(NodeScriptResultHandler, handleNoNodeInResults)
 TEST(NodeScriptResultHandler, handleLuaTableResult)
 {
     LuaState luaState;
-    osg::ref_ptr<osg::Node> node1 = new osg::Node;
-    osg::ref_ptr<osg::Node> node2 = new osg::Node;
+    osg::ref_ptr<EntityNode> node1 = new EntityNode;
+    osg::ref_ptr<EntityNode> node2 = new EntityNode;
 
     lua_newtable(luaState);
     lua_pushnumber(luaState, 1);
-    lua_pushOsgNode(luaState, node1);
+    lua_pushNode(luaState, node1);
     lua_rawset(luaState, -3);
     lua_pushnumber(luaState, 2);
-    lua_pushOsgNode(luaState, node2);
+    lua_pushNode(luaState, node2);
     lua_rawset(luaState, -3);
 
     NodeScriptResultHandler handler;
@@ -106,11 +127,11 @@ TEST(NodeScriptResultHandler, handleLuaTableResult)
 TEST(NodeScriptResultHandler, handleLuaTableWithOneNodeElementResult)
 {
     LuaState luaState;
-    osg::ref_ptr<osg::Node> node = new osg::Node;
+    osg::ref_ptr<EntityNode> node = new EntityNode;
 
     lua_newtable(luaState);
     lua_pushnumber(luaState, 1);
-    lua_pushOsgNode(luaState, node);
+    lua_pushNode(luaState, node);
     lua_rawset(luaState, -3);
     lua_pushnumber(luaState, 2);
     lua_pushstring(luaState, "none node result");

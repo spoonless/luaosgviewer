@@ -7,11 +7,11 @@ static inline int lua_decrement(int index)
     return index < 0 && index > LUA_REGISTRYINDEX ? index-1 : index;
 }
 
-osg::Node* swig_lua_toOsgNode(lua_State* L, int index);
+EntityNode* swig_lua_toEntityNode(lua_State *L, int index);
 
 osg::Node* lua_toOsgNode(lua_State *L, int index)
 {
-    osg::ref_ptr<osg::Node> node = swig_lua_toOsgNode(L, index);
+    osg::ref_ptr<osg::Node> node = swig_lua_toEntityNode(L, index);
     if (!node && lua_istable(L, index) && lua_checkstack(L, 2))
     {
         osg::ref_ptr<osg::Group> group = new osg::Group;
