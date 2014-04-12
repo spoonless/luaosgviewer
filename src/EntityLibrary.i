@@ -47,12 +47,19 @@ public:
     const char* getNameAsCharArray() const;
 
     void setName(const char *name);
-
 protected:
     ~EntityNode();
 };
 
-
+%extend EntityNode
+{
+    EntityNode* clone() const
+    {
+        EntityNode* entity = static_cast<EntityNode*>($self->clone(osg::CopyOp::SHALLOW_COPY));
+        entity->ref();
+        return entity;
+    }
+}
 
 class EntityLoader
 {
