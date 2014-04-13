@@ -7,6 +7,10 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 endif()
 
+if(MINGW)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -lstdc++-6 -lwinpthread-1 -dynamic")
+endif()
+
 project(MyProject)
 
 option(BUILD_UNITTESTS "Build all unit tests." OFF)
@@ -74,6 +78,7 @@ if(BUILD_UNITTESTS)
                    tests/osgLuaBinding_test.cpp
     )
     target_link_libraries(unittest core_sources)
+    
     config_executable(unittest GTEST)
     
     add_custom_target(test
