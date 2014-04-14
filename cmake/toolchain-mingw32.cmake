@@ -9,7 +9,8 @@ set(CMAKE_CXX_COMPILER i586-mingw32msvc-g++)
 set(CMAKE_RC_COMPILER i586-mingw32msvc-windres)
 
 # here is the target environment located
-set(CMAKE_FIND_ROOT_PATH /usr/i586-mingw32msvc/ "$ENV{OSGDIR}" "$ENV{OSG_DIR}" "$ENV{OSG_ROOT}")
+set(CMAKE_FIND_ROOT_PATH /usr/i586-mingw32msvc/ "$ENV{OSGDIR}" "$ENV{OSG_DIR}" "$ENV{OSG_ROOT}" "${OSG_DIR}")
+set(FORCE_USE_MINGW ON)
 
 # adjust the default behaviour of the FIND_XXX() commands:
 # search headers and libraries in the target environment, search 

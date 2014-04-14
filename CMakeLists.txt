@@ -4,8 +4,8 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
 project(MyProject)
 
-option(BUILD_UNITTESTS "Build all unit tests." OFF)
-option(FORCE_USE_MINGW "Set explicitly Mingw32 is used to build the application" OFF)
+option(BUILD_UNITTESTS "Build all unit tests.")
+option(FORCE_USE_MINGW "Set explicitly Mingw32 is used to build the application")
 if(NOT FORCE_USE_MINGW AND MINGW)
     set(FORCE_USE_MINGW ON)
 endif()
