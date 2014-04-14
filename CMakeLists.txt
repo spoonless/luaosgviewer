@@ -2,18 +2,18 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
-endif()
-
-if(MINGW)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -lstdc++-6 -lwinpthread-1 -dynamic")
-endif()
-
 project(MyProject)
 
 option(BUILD_UNITTESTS "Build all unit tests." OFF)
+option(FORCE_USE_MINGW "Set explicitly Mingw32 is used to build the application" OFF)
+if(NOT FORCE_USE_MINGW AND MINGW)
+    set(FORCE_USE_MINGW ON)
+endif()
+
+if(CMAKE_COMPILER_IS_GNUCXX OR FORCE_USE_MINGW)
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
+endif()
 
 include("EmbedLuajit")
 include("LuaSWIG")
@@ -24,6 +24,18 @@ find_package( osgDB )
 find_package( osgUtil )
 find_package( osgViewer )
 find_package( osgGA )
+
+if(NOT OSG_FOUND)
+    message(WARNING
+            "Package osg required, but not found! "
+            "You should set properly OSG_DIR variable to the install directory of OpenSceneGraph. "
+            "OSG_DIR can be declared as environment variable or as CMake variable (-DOSG_DIR=...).")
+endif()
+
+if(OSG_LIBRARY MATCHES ".*libosg.a$")
+    add_definitions(-DOSG_LIBRARY_STATIC)
+    set(OSG_LIBRARY_STATIC 1)
+endif()
 
 macro( config_executable PROJNAME )
     foreach(LIBNAME ${ARGN})
@@ -55,7 +67,25 @@ add_library(core_sources STATIC
     ${GENERATED_SOURCES}
 )
 
-config_executable(core_sources LUAJIT OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER)
+# Dependency order really matters for static linking
+config_executable(core_sources OSGVIEWER OSGGA OSGUTIL OSGDB OSG OPENTHREADS LUAJIT)
+
+if(OSG_LIBRARY_STATIC)
+    set(OSG_PLUGINS_DIRECTORY CACHE PATH "The path to the osgPlugins-x.x.x directory (normally in the lib directory of OpenSceneGraph install directory)")
+    if(NOT OSG_PLUGINS_DIRECTORY)
+        message(SEND_ERROR "You must define the OSG_PLUGINS_DIRECTORY variable for static link!")
+    endif()
+    link_directories("${OSG_PLUGINS_DIRECTORY}")
+    target_link_libraries(core_sources osgdb_osg)
+    config_executable(core_sources OSGDB)
+    if(WIN32)
+        target_link_libraries(core_sources opengl32)
+        target_link_libraries(core_sources gdi32)
+        if(FORCE_USE_MINGW)
+            set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -lstdc++ -lgcc -lwinpthread -dynamic")
+        endif()
+    endif()
+endif()
 
 ###############################################
 # main executable settings
@@ -77,15 +107,15 @@ if(BUILD_UNITTESTS)
                    tests/nodescriptresulthandler_test.cpp
                    tests/osgLuaBinding_test.cpp
     )
-    target_link_libraries(unittest core_sources)
-    
+
     config_executable(unittest GTEST)
-    
+    target_link_libraries(unittest core_sources)
+
     add_custom_target(test
                       "$<TARGET_FILE:unittest>"
                       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/tests")
     add_dependencies(test unittest)
-    
+
     if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_BUILD_TYPE STREQUAL "Coverage")
         include("CodeCoverage")
         setup_target_for_coverage(coverage unittest coverage)

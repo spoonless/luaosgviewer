@@ -5,6 +5,18 @@
 #include "osgViewer/Viewer"
 #include "ScriptLoaderCallback.h"
 
+#ifdef OSG_LIBRARY_STATIC
+
+#include <osgDB/ReadFile>
+
+USE_OSGPLUGIN(osg)
+USE_OSGPLUGIN(osg2)
+
+// include the platform specific GraphicsWindow implementation.
+USE_GRAPHICSWINDOW()
+
+#endif
+
 int main (int argc, const char** argv) {
     if (argc > 1) {
         osg::ref_ptr<osg::Group> group = new osg::Group;
