@@ -18,12 +18,12 @@ endif()
 include("EmbedLuajit")
 include("LuaSWIG")
 
-find_package( OpenThreads )
-find_package( osg )
-find_package( osgDB )
-find_package( osgUtil )
-find_package( osgViewer )
-find_package( osgGA )
+find_package(OpenThreads)
+find_package(osg)
+find_package(osgDB)
+find_package(osgUtil)
+find_package(osgViewer)
+find_package(osgGA)
 
 if(NOT OSG_FOUND)
     message(WARNING
@@ -52,6 +52,7 @@ include_directories("src")
 generate_lua_wrap("src/ModelLibrary.i" GENERATED_SOURCES)
 
 add_library(core_sources STATIC
+    src/StaticImport.h
     src/ModelLibrary.h
     src/ModelLibrary.cpp
     src/osgLuaBinding.h
@@ -67,27 +68,28 @@ add_library(core_sources STATIC
     ${GENERATED_SOURCES}
 )
 
-# Dependency order really matters for static linking
-config_executable(core_sources OSGVIEWER OSGGA OSGUTIL OSGDB OSG OPENTHREADS LUAJIT)
-
 if(OSG_LIBRARY_STATIC)
     set(OSG_PLUGINS_DIRECTORY CACHE PATH "The path to the osgPlugins-x.x.x directory (normally in the lib directory of OpenSceneGraph install directory)")
     if(NOT OSG_PLUGINS_DIRECTORY)
         message(SEND_ERROR "You must define the OSG_PLUGINS_DIRECTORY variable for static link!")
     endif()
     link_directories("${OSG_PLUGINS_DIRECTORY}")
-    target_link_libraries(core_sources osgdb_osg)
-    config_executable(core_sources OSGDB)
+    set(LIBRARIES_LINKED_BEFORE_OSG osgdb_osg osgdb_obj osgdb_rgb osgdb_serializers_osg osgdb_deprecated_osg)
     if(WIN32)
-        target_link_libraries(core_sources opengl32 gdi32)
+        set(LIBRARIES_LINKED_AFTER_OSG opengl32 gdi32)
         if(FORCE_USE_MINGW)
             set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -lstdc++ -lgcc -lwinpthread -dynamic")
         endif()
     endif()
     if(UNIX)
-        target_link_libraries(core_sources pthread GL Xrandr)
+        set(LIBRARIES_LINKED_AFTER_OSG pthread GL Xrandr)
     endif()
 endif()
+
+# Dependency order really matters for static linking
+target_link_libraries(core_sources ${LIBRARIES_LINKED_BEFORE_OSG})
+config_executable(core_sources OSGVIEWER OSGGA OSGUTIL OSGDB OSG OPENTHREADS LUAJIT)
+target_link_libraries(core_sources ${LIBRARIES_LINKED_AFTER_OSG})
 
 ###############################################
 # main executable settings
