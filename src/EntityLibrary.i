@@ -43,10 +43,6 @@ void lua_pushNode(lua_State* L, EntityNode *entity)
 
 class EntityNode
 {
-public:
-    const char* getNameAsCharArray() const;
-
-    void setName(const char *name);
 protected:
     ~EntityNode();
 };

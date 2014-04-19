@@ -20,6 +20,7 @@ find_package( osgDB )
 find_package( osgUtil )
 find_package( osgViewer )
 find_package( osgGA )
+find_package( osgText )
 
 macro( config_executable PROJNAME )
     foreach(LIBNAME ${ARGN})
@@ -51,7 +52,7 @@ add_library(core_sources STATIC
     ${GENERATED_SOURCES}
 )
 
-config_executable(core_sources LUAJIT OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGVIEWER)
+config_executable(core_sources LUAJIT OPENTHREADS OSG OSGDB OSGGA OSGUTIL OSGTEXT OSGVIEWER)
 
 ###############################################
 # main executable settings
