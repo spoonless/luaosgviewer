@@ -4,6 +4,7 @@
 #include "osg/Group"
 #include "osgViewer/Viewer"
 #include "ScriptLoaderCallback.h"
+#include "StaticImport.h"
 
 
 #include "osgText/Text"
