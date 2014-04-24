@@ -25,7 +25,7 @@ static int openLibrary(lua_State *L)
 {
     ScriptLibrary* scriptLibrary = reinterpret_cast<ScriptLibrary*>(lua_touserdata(L, lua_upvalueindex(1)));
     osg::ref_ptr<ScriptEngine> scriptEngine = getSelfReference(L);
-    if (scriptEngine.valid())
+    if (scriptLibrary && scriptEngine.valid())
     {
         return scriptLibrary->open(scriptEngine);
     }
@@ -44,9 +44,12 @@ ScriptEngine::~ScriptEngine()
 
 void ScriptEngine::addLibrary(ScriptLibrary &library)
 {
-    lua_pushlightuserdata(*this, &library);
-    lua_pushcclosure(*this, openLibrary, 1);
-    lua_pushstring(*this, library.getName());
-    lua_call(*this, 1, 0);
+    if (lua_checkstack(*this, 3))
+    {
+        lua_pushlightuserdata(*this, &library);
+        lua_pushcclosure(*this, openLibrary, 1);
+        lua_pushstring(*this, library.getName());
+        lua_call(*this, 1, 0);
+    }
 }
 

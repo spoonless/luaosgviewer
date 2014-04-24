@@ -16,6 +16,8 @@ public:
 
 class EntityNode;
 
+typedef int EventHandlersInternalRef;
+
 class EventHandlers : public osg::Referenced
 {
 public:
@@ -24,12 +26,15 @@ public:
 
     void fireEvent(const char *event, EntityNode *target);
 
+    EventHandlersInternalRef getEventHandlersInternalRef();
+
 protected:
-    ~EventHandlers();
+    ScriptEngine* lockScriptEngine();
+    virtual ~EventHandlers();
 
 private:
     osg::observer_ptr<ScriptEngine> _scriptEngine;
-    int _handlersReference;
+    EventHandlersInternalRef _handlersReference;
 };
 
 
@@ -52,8 +57,10 @@ public:
         if(_eventHandlers.valid()) _eventHandlers->fireEvent(event, this);
     }
 
+    EventHandlers* getOrCreateEventHandlers(ScriptEngine *scriptEngine);
+
 protected:
-    ~EntityNode();
+    virtual ~EntityNode();
 
 private:
     osg::ref_ptr<EventHandlers> _eventHandlers;
