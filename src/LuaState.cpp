@@ -3,12 +3,6 @@
 #include "lua.hpp"
 #include "LuaState.h"
 
-extern "C" {
-
-int luaopen_entity(lua_State*);
-
-}
-
 static void openlib(lua_State *L, const char *name, lua_CFunction func)
 {
     lua_pushcfunction(L, func);
@@ -74,7 +68,6 @@ LuaState::LuaState()
         openlib(_luaState, "table", luaopen_table);
         openlib(_luaState, "debug", luaopen_debug);
         openlib(_luaState, "jit", luaopen_jit);
-        openlib(_luaState, "entity", luaopen_entity);
     }
 }
 

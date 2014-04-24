@@ -141,7 +141,10 @@ int main (int argc, const char** argv) {
         osg::ref_ptr<osgText::Text> text = createText(osg::Vec3(50.0f, 50.0f, 0.0f), argv[1], 12.0f);
 
         osg::ref_ptr<osg::Group> world = new osg::Group;
-        osg::ref_ptr<ScriptLoaderCallback> callback = new ScriptLoaderCallback(new ScriptEngine, true);
+        osg::ref_ptr<ScriptEngine> scriptEngine = new ScriptEngine;
+        EntityScriptLibrary entityScriptLibrary;
+        scriptEngine->addLibrary(entityScriptLibrary);
+        osg::ref_ptr<ScriptLoaderCallback> callback = new ScriptLoaderCallback(scriptEngine, true);
         callback->setFilename(argv[1]);
         world->addUpdateCallback(callback);
 

@@ -1,6 +1,45 @@
 #include "osgDB/ReadFile"
 #include "EntityNode.h"
 
+#include "lua.hpp"
+
+extern "C" {
+
+int luaopen_entity(lua_State*);
+
+}
+
+const char* EntityScriptLibrary::getName() const
+{
+    return "entity";
+}
+
+int EntityScriptLibrary::open(ScriptEngine *scriptEngine)
+{
+    return luaopen_entity(*scriptEngine);
+}
+
+EventHandlers::EventHandlers(ScriptEngine *scriptEngine) : _scriptEngine(scriptEngine), _handlersReference(LUA_NOREF)
+{
+}
+
+EventHandlers::EventHandlers(const EventHandlers &eh) : _scriptEngine(eh._scriptEngine), _handlersReference(LUA_NOREF)
+{
+    if (eh._handlersReference != LUA_NOREF)
+    {
+        lua_rawgeti(*_scriptEngine, LUA_REGISTRYINDEX, eh._handlersReference);
+        _handlersReference = luaL_ref(*_scriptEngine, LUA_REGISTRYINDEX);
+    }
+}
+
+EventHandlers::~EventHandlers()
+{
+    if (_handlersReference != LUA_NOREF)
+    {
+        luaL_unref(*_scriptEngine, LUA_REGISTRYINDEX, _handlersReference);
+    }
+}
+
 EntityNode::EntityNode(osg::Node *node)
 {
     this->addChild(node);
