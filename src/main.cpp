@@ -75,6 +75,7 @@ protected:
                 if (_entityOnSight.valid())
                 {
                     nodeFound = true;
+                    _entityOnSight->fireEvent("focusin");
                     _console->setText(_entityOnSight->getName());
                 }
             }

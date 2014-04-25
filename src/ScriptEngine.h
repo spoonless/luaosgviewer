@@ -25,6 +25,8 @@ public:
 
     void addLibrary(ScriptLibrary &library);
 
+    static ScriptEngine* from(lua_State*);
+
 protected:
     virtual ~ScriptEngine();
 

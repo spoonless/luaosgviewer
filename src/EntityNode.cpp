@@ -1,5 +1,6 @@
 #include "osgDB/ReadFile"
 #include "EntityNode.h"
+#include "osgLuaBinding.h"
 
 #include "lua.hpp"
 
@@ -52,6 +53,32 @@ EventHandlers::~EventHandlers()
     }
 }
 
+void EventHandlers::fireEvent(const char *event, EntityNode *target)
+{
+    osg::ref_ptr<ScriptEngine> scriptEngine = this->lockScriptEngine();
+    int nbPop = 0;
+    if(scriptEngine.valid() && _handlersReference != LUA_NOREF && _handlersReference != LUA_REFNIL)
+    {
+        lua_rawgeti(*scriptEngine, LUA_REGISTRYINDEX, _handlersReference);
+        ++nbPop;
+        if(lua_istable(*scriptEngine, -1))
+        {
+            lua_getfield(*scriptEngine, -1, event);
+            ++nbPop;
+            if (lua_isfunction(*scriptEngine, -1))
+            {
+                lua_pushNode(*scriptEngine, target);
+                --nbPop;
+                if (lua_pcall(*scriptEngine, 1, 0, 0))
+                {
+                    ++nbPop;
+                }
+            }
+        }
+        lua_pop(*scriptEngine, nbPop);
+    }
+}
+
 EventHandlersInternalRef EventHandlers::getEventHandlersInternalRef()
 {
     if (_handlersReference == LUA_NOREF)
@@ -81,13 +108,30 @@ EntityNode::EntityNode(osg::Node *node)
 
 EntityNode::EntityNode(const EntityNode &entity,const osg::CopyOp& copyop) : osg::Group(entity, copyop)
 {
-
+    if (entity._eventHandlers.valid())
+    {
+        this->_eventHandlers = new EventHandlers(*entity._eventHandlers);
+    }
 }
 
 EntityNode::~EntityNode()
 {
 
 }
+
+EventHandlers* EntityNode::getOrCreateEventHandlers(ScriptEngine *scriptEngine)
+{
+    if(_eventHandlers.valid())
+    {
+        return _eventHandlers;
+    }
+    else
+    {
+        _eventHandlers = new EventHandlers(scriptEngine);
+    }
+    return _eventHandlers.get();
+}
+
 
 EntityNode* EntityLoader::operator()(const char* filename)
 {
