@@ -2,7 +2,7 @@
 #include "EntityNode.h"
 #include "osgLuaBinding.h"
 
-#include "lua.hpp"
+#include "luaX.h"
 
 extern "C" {
 
@@ -10,95 +10,110 @@ int luaopen_entity(lua_State*);
 
 }
 
-const char* EntityScriptLibrary::getName() const
-{
-    return "entity";
-}
-
-int EntityScriptLibrary::open(ScriptEngine *scriptEngine)
-{
-    return luaopen_entity(*scriptEngine);
-}
-
-EventHandlers::EventHandlers(ScriptEngine *scriptEngine) : _scriptEngine(scriptEngine), _handlersReference(LUA_NOREF)
+EntityLibrary::EntityLibrary() : _luaState(0)
 {
 }
 
-EventHandlers::EventHandlers(const EventHandlers &eh) : _scriptEngine(eh._scriptEngine), _handlersReference(LUA_NOREF)
+int EntityLibrary::open(LuaState &luaState)
 {
-    if (eh._handlersReference != LUA_NOREF)
+    _luaState = &luaState;
+    return luaopen_entity(static_cast<lua_State*>(*_luaState));
+}
+
+void EntityLibrary::freeInternalRef(LuaEventHandlersRef ref)
+{
+    if (_luaState->good() && ref != LUA_NOREF)
     {
-        osg::ref_ptr<ScriptEngine> scriptEngine = this->lockScriptEngine();
-        if (scriptEngine.valid() && lua_checkstack(*scriptEngine, 3))
-        {
-            lua_newtable(*scriptEngine);
-            lua_createtable(*scriptEngine, 0, 1);
-            lua_rawgeti(*scriptEngine, LUA_REGISTRYINDEX, eh._handlersReference);
-            lua_setfield(*scriptEngine, -2, "__index");
-            lua_setmetatable(*scriptEngine, -2);
-            _handlersReference = luaL_ref(*scriptEngine, LUA_REGISTRYINDEX);
-        }
+        luaL_unref(*_luaState, LUA_REGISTRYINDEX, ref);
     }
 }
 
-EventHandlers::~EventHandlers()
+EventHandlers* EntityLibrary::createEventHandlers()
 {
-    if (_handlersReference != LUA_NOREF)
+    if (!_luaState->good())
     {
-        osg::ref_ptr<ScriptEngine> scriptEngine = this->lockScriptEngine();
-        if (scriptEngine.valid())
-        {
-            luaL_unref(*scriptEngine, LUA_REGISTRYINDEX, _handlersReference);
-        }
+        return 0;
     }
+
+    lua_newtable (*_luaState);
+    LuaEventHandlersRef ref = luaL_ref(*_luaState, LUA_REGISTRYINDEX);
+
+    return new EventHandlers(this, ref);
 }
 
-void EventHandlers::fireEvent(const char *event, EntityNode *target)
+void EntityLibrary::fireEvent(EventHandlers *eventHandlers, const char *event, EntityNode *target)
 {
-    osg::ref_ptr<ScriptEngine> scriptEngine = this->lockScriptEngine();
+    if (!_luaState->good())
+    {
+        return;
+    }
+
+    MARK_LUA_STACK(*_luaState);
     int nbPop = 0;
-    if(scriptEngine.valid() && _handlersReference != LUA_NOREF && _handlersReference != LUA_REFNIL)
+    if(eventHandlers->_eventHandlersRef != LUA_NOREF && eventHandlers->_eventHandlersRef != LUA_REFNIL)
     {
-        lua_rawgeti(*scriptEngine, LUA_REGISTRYINDEX, _handlersReference);
+        lua_rawgeti(*_luaState, LUA_REGISTRYINDEX, eventHandlers->_eventHandlersRef);
         ++nbPop;
-        if(lua_istable(*scriptEngine, -1))
+        if(lua_istable(*_luaState, -1))
         {
-            lua_getfield(*scriptEngine, -1, event);
+            lua_getfield(*_luaState, -1, event);
             ++nbPop;
-            if (lua_isfunction(*scriptEngine, -1))
+            if (lua_isfunction(*_luaState, -1))
             {
-                lua_pushNode(*scriptEngine, target);
+                lua_pushNode(*_luaState, target);
                 --nbPop;
-                if (lua_pcall(*scriptEngine, 1, 0, 0))
+                if (lua_pcall(*_luaState, 1, 0, 0))
                 {
                     ++nbPop;
                 }
             }
         }
-        lua_pop(*scriptEngine, nbPop);
+        lua_pop(*_luaState, nbPop);
     }
+    CHECK_LUA_STACK(*_luaState);
 }
 
-EventHandlersInternalRef EventHandlers::getEventHandlersInternalRef()
+void EntityLibrary::copyEventHandlers(const EventHandlers *from, EventHandlers *to)
 {
-    if (_handlersReference == LUA_NOREF)
+    MARK_LUA_STACK(*_luaState);
+    if(_luaState->good() && from->_eventHandlersRef != LUA_NOREF && lua_checkstack(*_luaState, 6))
     {
-        osg::ref_ptr<ScriptEngine> scriptEngine = this->lockScriptEngine();
-        if (scriptEngine.valid())
+        if (to->_eventHandlersRef == LUA_NOREF)
         {
-            lua_newtable (*scriptEngine);
-            _handlersReference = luaL_ref(*scriptEngine, LUA_REGISTRYINDEX);
+            lua_newtable (*_luaState);
+            lua_pushvalue(*_luaState, -1);
+            to->_eventHandlersRef = luaL_ref(*_luaState, LUA_REGISTRYINDEX);
         }
+        else
+        {
+            lua_rawgeti(*_luaState, LUA_REGISTRYINDEX, to->_eventHandlersRef);
+        }
+        lua_rawgeti(*_luaState, LUA_REGISTRYINDEX, from->_eventHandlersRef);
+        lua_pushnil(*_luaState);
+        while (lua_next(*_luaState, -2))
+        {
+            lua_pushvalue(*_luaState, -2);
+            lua_pushvalue(*_luaState, -2);
+            lua_rawset(*_luaState, -6);
+            lua_pop(*_luaState, 1);
+        }
+        lua_pop(*_luaState, 2);
     }
-    return _handlersReference;
+    CHECK_LUA_STACK(*_luaState);
 }
 
-
-ScriptEngine* EventHandlers::lockScriptEngine()
+EventHandlers::EventHandlers(EntityLibrary *entityLibrary, LuaEventHandlersRef internalRef) : _entityLibrary(entityLibrary), _eventHandlersRef(internalRef)
 {
-    osg::ref_ptr<ScriptEngine> lock;
-    _scriptEngine.lock(lock);
-    return lock.release();
+}
+
+EventHandlers::EventHandlers(const EventHandlers &eh) : _entityLibrary(eh._entityLibrary), _eventHandlersRef(LUA_NOREF)
+{
+    _entityLibrary->copyEventHandlers(&eh, this);
+}
+
+EventHandlers::~EventHandlers()
+{
+    _entityLibrary->freeInternalRef(_eventHandlersRef);
 }
 
 EntityNode::EntityNode(osg::Node *node)
@@ -119,7 +134,7 @@ EntityNode::~EntityNode()
 
 }
 
-EventHandlers* EntityNode::getOrCreateEventHandlers(ScriptEngine *scriptEngine)
+EventHandlers* EntityNode::getOrCreateEventHandlers(EntityLibrary *entityLibrary)
 {
     if(_eventHandlers.valid())
     {
@@ -127,7 +142,7 @@ EventHandlers* EntityNode::getOrCreateEventHandlers(ScriptEngine *scriptEngine)
     }
     else
     {
-        _eventHandlers = new EventHandlers(scriptEngine);
+        _eventHandlers = entityLibrary->createEventHandlers();
     }
     return _eventHandlers.get();
 }

@@ -3,38 +3,56 @@
 
 #include "osg/observer_ptr"
 #include "osg/Group"
-#include "ScriptEngine.h"
-
-
-class EntityScriptLibrary : public ScriptLibrary
-{
-public:
-    virtual const char* getName() const;
-
-    virtual int open(ScriptEngine *scriptEngine);
-};
+#include "LuaState.h"
 
 class EntityNode;
+class EventHandlers;
 
-typedef int EventHandlersInternalRef;
+typedef int LuaEventHandlersRef;
+
+class EntityLibrary : public LuaExtensionLibrary
+{
+public:
+    EntityLibrary();
+
+    virtual int open(LuaState &luaState);
+
+    EventHandlers* createEventHandlers();
+
+    void copyEventHandlers(const EventHandlers *from, EventHandlers *to);
+
+    void fireEvent(EventHandlers *eventHandlers, const char *event, EntityNode *target);
+
+    void freeInternalRef(LuaEventHandlersRef ref);
+
+private:
+    LuaState *_luaState;
+};
+
 
 class EventHandlers : public osg::Referenced
 {
+    friend class EntityLibrary;
 public:
-    EventHandlers(ScriptEngine *scriptEngine);
     EventHandlers(const EventHandlers&);
 
-    void fireEvent(const char *event, EntityNode *target);
+    inline void fireEvent(const char *event, EntityNode *target)
+    {
+        this->_entityLibrary->fireEvent(this, event, target);
+    }
 
-    EventHandlersInternalRef getEventHandlersInternalRef();
+    operator LuaEventHandlersRef() const
+    {
+        return _eventHandlersRef;
+    }
 
 protected:
-    ScriptEngine* lockScriptEngine();
+    EventHandlers(EntityLibrary *entityLibrary, LuaEventHandlersRef internalRef);
     virtual ~EventHandlers();
 
 private:
-    osg::observer_ptr<ScriptEngine> _scriptEngine;
-    EventHandlersInternalRef _handlersReference;
+    EntityLibrary *_entityLibrary;
+    LuaEventHandlersRef _eventHandlersRef;
 };
 
 
@@ -57,7 +75,12 @@ public:
         if(_eventHandlers.valid()) _eventHandlers->fireEvent(event, this);
     }
 
-    EventHandlers* getOrCreateEventHandlers(ScriptEngine *scriptEngine);
+    EventHandlers* getOrCreateEventHandlers(EntityLibrary *entityLibrary);
+
+    inline EventHandlers* getEventHandlers()
+    {
+        return _eventHandlers;
+    }
 
 protected:
     virtual ~EntityNode();

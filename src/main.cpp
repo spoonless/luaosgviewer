@@ -143,8 +143,7 @@ int main (int argc, const char** argv) {
 
         osg::ref_ptr<osg::Group> world = new osg::Group;
         osg::ref_ptr<ScriptEngine> scriptEngine = new ScriptEngine;
-        EntityScriptLibrary entityScriptLibrary;
-        scriptEngine->addLibrary(entityScriptLibrary);
+        scriptEngine->openLibrary<EntityLibrary>("entity");
         osg::ref_ptr<ScriptLoaderCallback> callback = new ScriptLoaderCallback(scriptEngine, true);
         callback->setFilename(argv[1]);
         world->addUpdateCallback(callback);

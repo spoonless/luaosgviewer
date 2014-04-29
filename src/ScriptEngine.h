@@ -4,17 +4,6 @@
 #include "osg/Referenced"
 #include "LuaState.h"
 
-class ScriptEngine;
-
-class ScriptLibrary
-{
-public:
-    virtual const char* getName() const = 0;
-
-    virtual int open(ScriptEngine *scriptEngine) = 0;
-};
-
-
 /**
  * @brief The ScriptEngine class
  */
@@ -22,10 +11,6 @@ class ScriptEngine : public LuaState, public osg::Referenced
 {
 public:
     ScriptEngine();
-
-    void addLibrary(ScriptLibrary &library);
-
-    static ScriptEngine* from(lua_State*);
 
 protected:
     virtual ~ScriptEngine();

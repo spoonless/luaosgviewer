@@ -53,6 +53,7 @@ include_directories("src")
 generate_lua_wrap("src/EntityLibrary.i" GENERATED_SOURCES)
 
 add_library(core_sources STATIC
+    src/luaX.h
     src/StaticImport.h
     src/EntityNode.h
     src/EntityNode.cpp

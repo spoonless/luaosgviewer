@@ -6,12 +6,9 @@
 %{
 
 #include "osgLuaBinding.h"
-#include "ScriptEngine.h"
 #include "EntityNode.h"
 
 typedef int LuaStackIndex;
-
-ScriptEngine* getSelfReference(lua_State *L);
 
 EntityNode* swig_lua_toEntityNode(lua_State* L, int index)
 {
@@ -80,15 +77,19 @@ protected:
             lua_error(L);
         }
 
-        osg::ref_ptr<ScriptEngine> scriptEngine = ScriptEngine::from(L);
-        osg::ref_ptr<EventHandlers> eventHandlers;
-        if (scriptEngine.valid())
+        osg::ref_ptr<EventHandlers> eventHandlers = $self->getEventHandlers();
+        if (! eventHandlers)
         {
-            eventHandlers = $self->getOrCreateEventHandlers(scriptEngine);
+            LuaState *luaState = LuaState::from(L);
+            if (luaState)
+            {
+                eventHandlers = $self->getOrCreateEventHandlers(luaState->getLibrary<EntityLibrary>());
+            }
         }
+
         if (eventHandlers.valid() && lua_checkstack(L,4))
         {
-            lua_rawgeti(L, LUA_REGISTRYINDEX, eventHandlers->getEventHandlersInternalRef());
+            lua_rawgeti(L, LUA_REGISTRYINDEX, static_cast<LuaEventHandlersRef>(*eventHandlers));
             lua_pushnil(L);  /* first key */
             while (lua_next(L, tableIndex) != 0)
             {
