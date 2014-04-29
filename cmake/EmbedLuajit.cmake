@@ -10,8 +10,8 @@ endif()
 # Note: FFI is disabled for security reasons
 ExternalProject_Add(
   project_luajit
-  URL http://luajit.org/download/LuaJIT-2.0.2.tar.gz
-  URL_MD5 112dfb82548b03377fbefbba2e0e3a5b
+  URL http://luajit.org/download/LuaJIT-2.0.3.tar.gz
+  URL_MD5 f14e9104be513913810cd59c8c658dc0
   PREFIX "${CMAKE_CURRENT_BINARY_DIR}/luajit"
   CONFIGURE_COMMAND ""
   BUILD_IN_SOURCE 1
