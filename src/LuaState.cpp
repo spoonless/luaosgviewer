@@ -103,6 +103,11 @@ LuaState::~LuaState()
 
 LuaState* LuaState::from(lua_State *L)
 {
+    if (!L)
+    {
+        return 0;
+    }
+    MARK_LUA_STACK(L);
     lua_getfield(L, LUA_REGISTRYINDEX, luaX_selfreference);
     LuaState *luaState = 0;
     if (lua_islightuserdata(L, -1))
@@ -110,11 +115,16 @@ LuaState* LuaState::from(lua_State *L)
         luaState = reinterpret_cast<LuaState*>(lua_touserdata(L, -1));
     }
     lua_pop(L, 1);
+    CHECK_LUA_STACK(L);
     return luaState;
 }
 
 LuaExtensionLibrary *LuaState::getLibrary(const char* internalLibname)
 {
+    if (!this->assertEngineReady())
+    {
+        return false;
+    }
     LuaExtensionLibrary *lib = 0;
     MARK_LUA_STACK(_luaState);
     pushExtensionLibraryRegistry();
@@ -127,6 +137,10 @@ LuaExtensionLibrary *LuaState::getLibrary(const char* internalLibname)
 
 bool LuaState::openLibrary(LuaExtensionLibrary *library, const char *internalLibname, const char *libname)
 {
+    if (!this->assertEngineReady())
+    {
+        return false;
+    }
     MARK_LUA_STACK(_luaState);
 
     lua_pushlightuserdata(_luaState, this);
@@ -190,17 +204,13 @@ bool LuaState::assertEngineReady()
         this->_lastError = "Script engine is not ready!";
         return false;
     }
+    this->_lastError.clear();
     return true;
 }
 
 bool LuaState::load(std::istream &istream, const char *streamname)
 {
     MARK_LUA_STACK(_luaState);
-    if (!this->assertEngineReady())
-    {
-        return false;
-    }
-    _lastError.clear();
     if (!streamname)
     {
         streamname = "unknown";
@@ -232,6 +242,10 @@ bool LuaState::load(std::istream &istream, const char *streamname)
 
 bool LuaState::exec(unsigned int nbExpectedResults, std::istream &istream, const char *streamname)
 {
+    if (!this->assertEngineReady())
+    {
+        return false;
+    }
     MARK_LUA_STACK(_luaState);
     if (! this->load(istream, streamname))
     {
@@ -251,6 +265,10 @@ bool LuaState::exec(unsigned int nbExpectedResults, std::istream &istream, const
 
 bool LuaState::exec(LuaResultHandler &handler, std::istream &istream, const char *streamname)
 {
+    if (!this->assertEngineReady())
+    {
+        return false;
+    }
     MARK_LUA_STACK(_luaState);
     bool result = false;
     int beginStackSize = lua_gettop(this->_luaState);

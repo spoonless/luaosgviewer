@@ -109,7 +109,7 @@ if(BUILD_UNITTESTS)
     include_directories("src")
     add_executable(unittest
                    tests/main.cpp
-                   tests/scriptengine_test.cpp
+                   tests/LuaStateTest.cpp
                    tests/nodescriptresulthandler_test.cpp
                    tests/osgLuaBinding_test.cpp
     )
