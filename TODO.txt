@@ -1,0 +1,7 @@
+* more unit tests (EntityNode and EntityLibrary)
+* adding new extension library (hud) to choose what message should be displayed on screen (using lua event function)
+* adding new binding for devices (mainly keyboard) to create key event binding
+* EntityLibrary extension : support basic animation through event handler
+* creating LUA console displayed by OSG (redirect lua print() to this console)
+* creating submodules with C++ namespaces (first of all ::binding)
+* activating LUA protected mode with lua_setfenv
