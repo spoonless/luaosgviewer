@@ -1,8 +1,7 @@
 #include "osgDB/ReadFile"
+#include "luaX.h"
 #include "EntityNode.h"
 #include "osgLuaBinding.h"
-
-#include "luaX.h"
 
 extern "C" {
 

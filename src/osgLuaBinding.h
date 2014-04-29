@@ -1,8 +1,8 @@
 #ifndef LUABINDING_H
 #define LUABINDING_H
 
-#include "EntityNode.h"
 #include "osg/Vec3"
+#include "EntityNode.h"
 
 extern "C" {
 

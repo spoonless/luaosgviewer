@@ -1,6 +1,6 @@
 #ifndef SCRIPTENGINE_H
 #define SCRIPTENGINE_H
-#include <string>
+
 #include "osg/Referenced"
 #include "LuaState.h"
 

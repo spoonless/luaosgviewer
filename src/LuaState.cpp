@@ -1,6 +1,6 @@
 #include <algorithm>
-#include "LuaState.h"
 #include "luaX.h"
+#include "LuaState.h"
 
 static const char* luaX_extensionLibraryTable = "_X_internal_extlib";
 static const char* luaX_selfreference = "_X_self";

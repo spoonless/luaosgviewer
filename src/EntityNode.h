@@ -1,7 +1,6 @@
 #ifndef ENTITYNODE_H
 #define ENTITYNODE_H
 
-#include "osg/observer_ptr"
 #include "osg/Group"
 #include "LuaState.h"
 

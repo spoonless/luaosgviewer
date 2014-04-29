@@ -1,7 +1,6 @@
-#include "lua.hpp"
 #include "gtest/gtest.h"
 #include "osg/observer_ptr"
-#include "osg/Group"
+#include "luaX.h"
 #include "EntityNode.h"
 #include "osgLuaBinding.h"
 #include "NodeScriptResultHandler.h"

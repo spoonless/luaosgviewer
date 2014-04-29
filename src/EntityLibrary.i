@@ -5,7 +5,6 @@
 %module entity
 %{
 
-#include "osgLuaBinding.h"
 #include "EntityNode.h"
 
 typedef int LuaStackIndex;

@@ -1,4 +1,4 @@
-#include "lua.hpp"
+#include "luaX.h"
 #include "osg/MatrixTransform"
 #include "osgLuaBinding.h"
 
@@ -11,6 +11,7 @@ EntityNode* swig_lua_toEntityNode(lua_State *L, int index);
 
 osg::Node* lua_toOsgNode(lua_State *L, int index)
 {
+    MARK_LUA_STACK(L);
     osg::ref_ptr<osg::Node> node = swig_lua_toEntityNode(L, index);
     if (!node && lua_istable(L, index) && lua_checkstack(L, 2))
     {
@@ -43,11 +44,13 @@ osg::Node* lua_toOsgNode(lua_State *L, int index)
             node = group;
         }
     }
+    CHECK_LUA_STACK(L);
     return node.release();
 }
 
 osg::Group* lua_toOsgMatrixTransform(lua_State *L, int index)
 {
+    MARK_LUA_STACK(L);
     if(lua_istable(L, index))
     {
         osg::Vec3 vec3 = lua_toOsgVec3(L, index);
@@ -56,15 +59,18 @@ osg::Group* lua_toOsgMatrixTransform(lua_State *L, int index)
             osg::Matrix matrix;
             matrix.setTrans(vec3);
             osg::ref_ptr<osg::MatrixTransform> matrixTransform = new osg::MatrixTransform(matrix);
+            CHECK_LUA_STACK(L);
             return matrixTransform.release();
         }
     }
+    CHECK_LUA_STACK(L);
     return 0;
 }
 
 template <class V>
 const V lua_toOsgVec(lua_State *L, int index, char firstComponentName)
 {
+    MARK_LUA_STACK(L);
     V vec;
     if (lua_istable(L, index) && lua_checkstack(L, 2))
     {
@@ -110,5 +116,6 @@ const V lua_toOsgVec(lua_State *L, int index, char firstComponentName)
     {
         vec[0] = NAN;
     }
+    CHECK_LUA_STACK(L);
     return vec;
 }

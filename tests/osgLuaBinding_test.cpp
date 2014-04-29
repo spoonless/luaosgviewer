@@ -1,7 +1,7 @@
 #include "lua.hpp"
 #include "gtest/gtest.h"
-#include "osgLuaBinding.h"
 #include "LuaState.h"
+#include "osgLuaBinding.h"
 
 static void pushTestString(LuaState &luaState, const char *test)
 {
