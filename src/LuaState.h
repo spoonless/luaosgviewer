@@ -90,10 +90,11 @@ private:
 
 template<class T> T* LuaState::getLibrary()
 {
+    static const char * const internalLibraryName = typeid(T).name();
     T* t = 0 ;
     if (this->assertEngineReady())
     {
-        t = static_cast<T*>(this->getLibrary(typeid(T).name()));
+        t = static_cast<T*>(this->getLibrary(internalLibraryName));
     }
     return t;
 }
