@@ -1,4 +1,4 @@
-local monkey = entity.load("monkey.osgt")
+local monkey = entity.load("monkey.obj")
 monkey.name = "my monkey"
 
 monkey:addEventHandlers{
