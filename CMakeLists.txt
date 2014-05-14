@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
-project(MyProject)
+project(luaosgviewer)
 
 option(BUILD_UNITTESTS "Build all unit tests.")
 option(FORCE_USE_MINGW "Set explicitly Mingw32 is used to build the application")
@@ -96,10 +96,15 @@ target_link_libraries(core_sources ${LIBRARIES_LINKED_AFTER_OSG})
 ###############################################
 # main executable settings
 ###############################################
-add_executable(MyProject
+add_executable(luaosgviewer
     src/main.cpp
 )
-target_link_libraries(MyProject core_sources)
+target_link_libraries(luaosgviewer core_sources)
+
+add_custom_target(run
+                  "$<TARGET_FILE:luaosgviewer>" test.lua
+                  WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/samples")
+add_dependencies(run luaosgviewer)
 
 ###############################################
 # unit tests project settings

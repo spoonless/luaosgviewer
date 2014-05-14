@@ -58,6 +58,7 @@ class ExperimentalSightHandler : public OnSightCallback
 public:
     ExperimentalSightHandler(osgText::Text *text) : _console(text)
     {
+        this->setSightLimit(3.0);
     }
 
 protected:
